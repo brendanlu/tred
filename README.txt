@@ -14,4 +14,6 @@ H., 2022. Dimensionality reduction of longitudinal’omics data using modern
 tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.
 
 NOTE: The original authors use m, p, n as the dimensions of the tensors, whereas 
-throughout this package one will see we prefer n, p, t instead. 
+throughout this package one will see we prefer n, p, t instead. We will also use
+k = min(n, p), where from an `omics analysis perspective, typically means that
+k = n. 
