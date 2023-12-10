@@ -1,161 +1,20 @@
-"""
-In development...
+"""In development...
 We want to give appropriate credit to https://github.com/UriaMorP/mprod_package; we are 
 rewriting the key implementations ourselves to better suit our purposes, and future 
 development we are interested in.
 """
 
 
-from numbers import Integral, Real
-
+from numbers import Integral
 import numpy as np
-import os
-from scipy.fft import dct, idct
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils import check_scalar
 
-
-class RealNotInt(Real):
-    """A type that represents reals that are not instances of int.
-
-    Behaves like float, but also works with values extracted from numpy arrays.
-    isintance(1, RealNotInt) -> False
-    isinstance(1.0, RealNotInt) -> True
-
-    From sklearn/utils/_param_validation.py
-    """
-
-
-RealNotInt.register(float)
-
-
-def _facewise_product(A, B):
-    """Facewise product s.t. $C_{:,:,i} = A_{:,:,i} B{:,:,i}$
-
-    This could be optimized later if needed.
-
-    Parameters
-    ----------
-    A : ArrayLike
-        $a \times b \times d$ tensor representation
-
-    B : ArrayLike
-        $b \times c \times d$ tensor representation
-
-    Returns
-    -------
-    C : ArrayLike
-        $a \times c \times d$ tensor representation
-
-    """
-
-    # return np.einsum('mpi,pli->mli', A, B)
-    # the following is a quicker version of the above using numpy broadcasting
-    return np.matmul(A.transpose(2, 0, 1), B.transpose(2, 0, 1)).transpose(1, 2, 0)
-
-
-def m_product(A, B, M, Minv):
-    """Kilmer et al. (2021) tensor m-product for order-3 tensors. See [1]
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-    """
-    assert (
-        A.shape[1] == B.shape[0] and A.shape[2] == B.shape[2]
-    ), "Non conforming dimensions"
-
-    hatA, hatB = M(A), M(B)
-    return Minv(_facewise_product(hatA, hatB))
-
-
-def generate_DCTii_M_transform_pair(t):
-    """Wrapper around scipy fft to generate functions to perform $\times_3 M$ operations
-    on order-3 tensors, where $M$ is the (scaled) Discrete Cosine Transform.
-
-    As introduced by Kilmer et al. (2021) and applied by Mor et al. (2022)
-
-    For now, this is the default transform; this may change later.
-
-    Parameters
-    ----------
-        t : int
-            The length of the transform
-
-    Returns
-    -------
-        fun_m : Callable[[ArrayLike], ArrayLike]
-            A function which expects an order-3 tensor as input, and applies DCT-II to
-            each of the tubal fibres. This preserves the dimensions of the tensor.
-
-        inv_m : Callable[[ArrayLike], ArrayLike]
-            A tensor transform (the inverse of `fun_m`)
-    """
-
-    def M(X):
-        assert X.shape[-1] == t, f"Expecting last input dimension to be {t}"
-        return dct(X, type=2, n=t, axis=-1, norm="ortho", workers=2 * os.cpu_count())
-
-    def Minv(X):
-        assert X.shape[-1] == t, f"Expecting last input dimension to be {t}"
-        return idct(X, type=2, n=t, axis=-1, norm="ortho", workers=2 * os.cpu_count())
-
-    return M, Minv
-
-
-def _singular_vals_mat_to_tensor(mat, n, p, t):
-    """Decompress $k \times t$ matrix of singular values into $\hat{S}$ from literature.
-
-    Parameters
-    ----------
-        mat : ArrayLike, shape: (k, t_)
-            $k \times t_$ matrix representation, the function checks if `t_ == t`
-
-        n : int
-            first dimension of output tensor
-
-        p : int
-            second dimension of output tensor
-
-        t : int
-            third dimensions of output tensor
-
-    Returns
-    -------
-        hatS : ArrayLike, shape: (n, p, t)
-            $n \times p \times t$ tensor representation
-    """
-    k = min(n, p)
-    assert k == mat.shape[0] and t == mat.shape[1], "Ensure conforming dimensions"
-
-    hatS = np.zeros((n, p, t))
-    for i in range(t):
-        hatS[:k, :k, i] = np.diag(mat[:, i])
-
-    return hatS
-
-
-def _singular_vals_tensor_to_mat(tensor):
-    """Compresses $\hat{S}$, a $n \times p \times t$ f-diagonal tensor of singular values
-    into a $k \times t$ matrix. Each row contains the $k$ singular values from that
-    longitudinal slice.
-
-    Reverses _singular_vals_mat_to_tensor
-
-    Parameters
-    ----------
-        tensor : ArrayLike, shape: (n, p, t)
-            $n \times p \times t$ tensor representation
-
-    Returns
-    -------
-        mat : ArrayLike, shape: (min(n, p), t)
-            $k \times t$ matrix representation of singular values, where
-            $k = \min{(n,p)}$
-    """
-    return np.diagonal(tensor, axis1=0, axis2=1).transpose()
+from ._base import RealNotInt, _facewise_product, m_product
+from ._utils import (
+    generate_DCTii_M_transform_pair,
+    _singular_vals_mat_to_tensor,
+    _singular_vals_tensor_to_mat,
+)
 
 
 def tsvdm(
@@ -180,11 +39,11 @@ def tsvdm(
         A : ArrayLike, shape: (n, p, t)
             $n \times p \times t$ data tensor
 
-        M : Callable[[ArrayLike], ArrayLike]
+        M : Callable[[ArrayLike], ndarray]
             A function which, given some order-3 tensor, returns it under some $\times_3$
             invertible transformation.
 
-        MInv : Callable[[ArrayLike], ArrayLike]
+        MInv : Callable[[ArrayLike], ndarray]
             The inverse transformation of M
 
         keep_hats : bool, default=False
@@ -204,11 +63,11 @@ def tsvdm(
 
     Returns
     -------
-        U_tens : ArrayLike, shape: (n, n, t) if full_matrices else (n, k, t)
+        U_tens : ndarray, shape: (n, n, t) if full_matrices else (n, k, t)
 
-        S_tens : ArrayLike, shape: (n, p, t) if not compact_svals else (k, t)
+        S_tens : ndarray, shape: (n, p, t) if not compact_svals else (k, t)
 
-        V_tens : ArrayLike, shape: (p, p, t) if full_matrices else (p, k, t)
+        V_tens : ndarray, shape: (p, p, t) if full_matrices else (p, k, t)
     """
 
     assert not (
@@ -226,13 +85,15 @@ def tsvdm(
     # we reshape into a sparse tensor
     #
     # the transpose tensor stacks top to bottom, with t horizontal slices of size n by p
-    U_stack, S_mat, V_stack = np.linalg.svd(
+    U_stack, S_mat, Vt_stack = np.linalg.svd(
         hatA.transpose(2, 0, 1), full_matrices=full_frontal_slices
     )
 
     hatU = U_stack.transpose(1, 2, 0)
     S_mat = S_mat.transpose()
-    hatV = V_stack.transpose(2, 1, 0)
+    # the following is a call to .transpose(1, 2, 0) followed by a facewise transpose
+    # defined by .transpose(1, 0, 2)
+    hatV = Vt_stack.transpose(2, 1, 0)
 
     if keep_hats:
         return (
