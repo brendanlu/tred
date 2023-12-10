@@ -155,13 +155,7 @@ def _singular_vals_tensor_to_mat(tensor):
             $k \times t$ matrix representation of singular values, where
             $k = \min{(n,p)}$
     """
-    n, p, t = tensor.shape
-    k = min(n, p)
-    S_mat = np.zeros((k, t))
-    for i in range(t):
-        S_mat[:, i] = np.diagonal(tensor[:, :, i])
-
-    return S_mat
+    return np.diagonal(tensor, axis1=0, axis2=1).transpose()
 
 
 def tsvdm(
