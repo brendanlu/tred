@@ -8,6 +8,7 @@ development we are interested in.
 from numbers import Integral
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
 
 from ._base import RealNotInt, _facewise_product, _m_product
 from ._utils import _singular_vals_mat_to_tensor, _singular_vals_tensor_to_mat
@@ -181,22 +182,16 @@ class TPCA(BaseEstimator, TransformerMixin):
         pass
 
     def fit_transform(self, X, y=None):
-        """Fit the model with X and apply the dimensionality reduction on X. This mirrors
-        sklearn's PCA fit_transform method, whereby $Z = X \times_M V = U \times_M S$
-
+        """Fit the model with X and apply the dimensionality reduction on X. 
         """
-        hatU, hatS_mat, hatV = self._fit(X)
-        hatU = hatU
-
-        """
-        ... in progress ...
-        """
-
-        return hatU
-
-    def _fit_transform_naive(self, X, y=None):
         self._fit(X)
         return self._transform(X)
+
+    def _alternative_fit_transform(self, X, y=None):
+        """Try sklearn's PCA fit_transform method: 
+            $Z = X \times_M V = U \times_M S$
+        """
+        pass
 
     def _fit(self, X):
         """Fit the model by computing the full SVD on X
@@ -237,12 +232,21 @@ class TPCA(BaseEstimator, TransformerMixin):
             svals_matrix_form=True,
         )
 
+        # we flatten out the compressed singular value matrix in Fortran memory style 
+        # (column-wise). tensor-wise, we can interpret this as stacking the horizontals
+        # of each tensor faces next to each other in the flattened array, where the 
+        # singular values are grouped by face
+        # 
+        # see below, we store the .argsort() of this descending sort for picking out 
+        # the corresponding top components in the transformed data
+        singular_values_ = hatS_mat.flatten(order='F')
+        self._k_t_flatten_sort = singular_values_.argsort()[::-1]
+        singular_values_ = singular_values_[self._k_t_flatten_sort]
+
         # get variance explained by singular values
         # note that we are not yet aware of any notion of 'variance' for random tensors
         # so we do not have sklearn PCA's self.explained_variance_
         # however we may find literature for this in the future to include it
-        singular_values_ = hatS_mat.copy().ravel()
-        singular_values_[::-1].sort()  # sort decreasing order in place, avoiding copy
         squared_singular_values = singular_values_**2
         total_var = np.sum(squared_singular_values)
         explained_variance_ratio_ = squared_singular_values / total_var
@@ -256,11 +260,11 @@ class TPCA(BaseEstimator, TransformerMixin):
                 # greater proportion of the total squared sum of singular values
                 ratio_cumsum = np.cumsum(explained_variance_ratio_)
                 # np.searchsorted call returns the mininum i
-                #   s.t. n_components < ratio_cumsum[i] (see docs)
+                #   s.t. n_components < ratio_cumsum[i] (see numpy searchsorted docs)
                 # which means that the (i+1)th element in ratio_cumsum[i] strictly exceeds
                 # the user's specified variance ratio
                 n_components = (
-                    np.searchsorted(ratio_cumsum, n_components, side="right") + 1
+                    np.searchsorted(ratio_cumsum, self.n_components, side="right") + 1
                 )
             else:
                 raise ValueError(
@@ -288,7 +292,7 @@ class TPCA(BaseEstimator, TransformerMixin):
         # each diagonal of the frontal slice is already sorted in decreasing order
         # np.searchsorted is called on each column, reversed so that it is ascending,
         # where it returns the index i
-        #   s.t. sigma_q <= ascending_col[i]
+        #   s.t. sigma_q <= ascending_col[i] (see numpy searchsorted docs)
         # which mean that we want to discard the i smallest values, and keep the other
         # k-i, which is the number we store in rho
         rho = np.apply_along_axis(
@@ -301,17 +305,19 @@ class TPCA(BaseEstimator, TransformerMixin):
             "Ah, you are the first unlucky person to run into a rare edge case"
             "This is because your singular values tensor contains tied singular values"
             "Our implementation is yet to appropriately handle this"
-            "Let us know and we will implement the logic, if we have not already"
+            "Please let us know, and either increase or decrease your n_components input"
         )
 
-        # perform multi-rank truncation, t should be modestly sized so the for-loop
+        # perform multi-rank truncation, t should be modestly sized, so the for-loop
         # should be bearable
-        for i in range(t): 
-            hatU[:, :rho[i], i] = 0
-            hatS_mat[:rho[i], i] = 0 
-            hatV[:, :rho[i], i] = 0
+        for i in range(t):
+            hatU[:, : rho[i], i] = 0
+            hatS_mat[: rho[i], i] = 0
+            hatV[:, : rho[i], i] = 0
 
-        # store useful attributes; as per sklearn conventions, we use trailing underscores 
+        self._hatV_ = hatV
+
+        # store useful attributes; as per sklearn conventions, we use trailing underscores
         # to indicate that they have been populated following a call to fit()
         self.n_, self.p_, self.t_ = n, p, t
         self.n_components_ = n_components
@@ -321,18 +327,20 @@ class TPCA(BaseEstimator, TransformerMixin):
         return hatU, hatS_mat, hatV
 
     def _transform(self, X):
+        """TCAM algorithm from Mor et al. (2022)"""
+
+        check_is_fitted(self)
         assert len(X.shape) == 3, "Ensure order-3 tensor input"
         assert (
             X.shape[1] == self.p_ and X.shape[2] == self.t_
         ), "Ensure the number of features, and time points, matches the model fit data"
 
-        # center the data, ensure we do not do this in-place using -=
+        # center the data, creating a new copy of X
         X = X - self.mean_
+        # in the interest of efficiency, V was returned in the m-transformed space from
+        # tsvdm saving a pair of roundabout calls to M and Minv
+        X_transformed = _facewise_product(self.M(X), self._hatV_)
 
-        # in the interest of efficiency, we returned V in the m-transformed space from
-        # tsvdm saving two redundant calls to M and Minv
-        # but, the code below is a bit ugly(ier) than a straightforward call to
-        # m_product()
-        X_transformed = self.Minv(_facewise_product(self.M(X), self.hat_components_))
+        # truncate the output
 
         return X_transformed

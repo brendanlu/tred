@@ -1,4 +1,4 @@
-"""General utility functions, computational utilities"""
+"""General utility functions, loosely: computational utilities"""
 
 
 import numpy as np
@@ -33,6 +33,7 @@ def display_tensor_facewise(tens):
     [0. 0. 1.]]]
     """
     assert len(tens.shape) == 3, "expecting tensor (order-3) array input!"
+    print(f"Tensor with dimensions {tens.shape}")
     print(tens.transpose(2, 0, 1))
 
 
