@@ -1,4 +1,4 @@
-"""Base module"""
+"""Base module, loosely: mathematical utilities"""
 
 
 from numbers import Real
@@ -6,13 +6,13 @@ import numpy as np
 
 
 class RealNotInt(Real):
-    """A type that represents reals that are not instances of int.
+    """A type that represents non-integer real numbers.
+
+    [COPIED] From sklearn/utils/_param_validation.py
 
     Behaves like float, but also works with values extracted from numpy arrays.
     isintance(1, RealNotInt) -> False
     isinstance(1.0, RealNotInt) -> True
-
-    From sklearn/utils/_param_validation.py
     """
 
 
@@ -21,8 +21,6 @@ RealNotInt.register(float)
 
 def _facewise_product(A, B):
     """Facewise product s.t. $C_{:,:,i} = A_{:,:,i} B{:,:,i}$
-
-    This could be optimized later if needed.
 
     Parameters
     ----------
@@ -57,5 +55,4 @@ def _m_product(A, B, M, Minv):
         A.shape[1] == B.shape[0] and A.shape[2] == B.shape[2]
     ), "Non conforming dimensions"
 
-    hatA, hatB = M(A), M(B)
-    return Minv(_facewise_product(hatA, hatB))
+    return Minv(_facewise_product(M(A), M(B)))

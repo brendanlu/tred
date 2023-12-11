@@ -11,8 +11,6 @@ def generate_DCTii_M_transform_pair(t):
 
     As introduced by Kilmer et al. (2021) and applied by Mor et al. (2022)
 
-    For now, this is the default transform; this may change later.
-
     Parameters
     ----------
         t : int

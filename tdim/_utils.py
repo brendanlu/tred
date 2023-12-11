@@ -1,15 +1,14 @@
-"""General utility functions"""
+"""General utility functions, computational utilities"""
 
 
 import numpy as np
 
 
 def display_tensor_facewise(tens):
-    """Numpy - by default prints order-3 arrays as vertical stacks of order-2 arrays, in
+    """By default Numpy prints order-3 arrays as vertical stacks of order-2 arrays, in
     line with their broadcasting rules. This function prints a transpose view so the
-    print output is a more intuitive sequence of frontal slices. 
-
-    We use this in notebooks when exploring data.
+    print output is a more intuitive sequence of frontal slices. We often use this in
+    notebooks.
 
     Examples
     --------
@@ -39,6 +38,9 @@ def display_tensor_facewise(tens):
 
 def _singular_vals_mat_to_tensor(mat, n, p, t):
     """Decompress $k \times t$ matrix of singular values into $\hat{S}$ from literature.
+
+    NOTE: There's probably a cool numpy way to do this without the for loop...but for now
+    it works fine as $t$ is usually modest for the data we work with
 
     Parameters
     ----------
@@ -87,4 +89,18 @@ def _singular_vals_tensor_to_mat(tensor):
             $k \times t$ matrix representation of singular values, where
             $k = \min{(n,p)}$
     """
+
+    """
+    # for reference, below is the more mathematically interpretable version
+    n, p, t = tensor.shape
+    k = min(n, p)
+    mat = np.zeros((k, t))
+    for i in range(t):
+        mat[:, i] = np.diagonal(tensor[:, :, i])
+
+    # assertion checks if they are equal 
+    assert(np.array_equal(mat, np.diagonal(tensor, axis1=0, axis2=1).transpose()))
+    """
+
+    # but we implement using one of the various numpy tricks
     return np.diagonal(tensor, axis1=0, axis2=1).transpose()
