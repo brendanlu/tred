@@ -1,43 +1,40 @@
-"""Various utility functions"""
+"""General utility functions"""
 
 
 import numpy as np
-import os
-from scipy.fft import dct, idct
 
 
-def generate_DCTii_M_transform_pair(t):
-    """Wrapper around scipy fft to generate functions to perform $\times_3 M$ operations
-    on order-3 tensors, where $M$ is the (scaled) Discrete Cosine Transform.
+def display_tensor_facewise(tens):
+    """Numpy - by default prints order-3 arrays as vertical stacks of order-2 arrays, in
+    line with their broadcasting rules. This function prints a transpose view so the
+    print output is a more intuitive sequence of frontal slices. 
 
-    As introduced by Kilmer et al. (2021) and applied by Mor et al. (2022)
+    We use this in notebooks when exploring data.
 
-    For now, this is the default transform; this may change later.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from tdim import display_tensor_facewise as disp
+    >>> test = np.eye(3)[:, :, None] # a 3x3x1 tensor
+    >>> print(test) # Numpy ndarrays default __str__ method is not intuitive here
+    [[[1.]
+    [0.]
+    [0.]]
 
-    Parameters
-    ----------
-        t : int
-            The length of the transform
+    [[0.]
+    [1.]
+    [0.]]
 
-    Returns
-    -------
-        fun_m : Callable[[ArrayLike], ndarray]
-            A function which expects an order-3 tensor as input, and applies DCT-II to
-            each of the tubal fibres. This preserves the dimensions of the tensor.
-
-        inv_m : Callable[[ArrayLike], ndarray]
-            A tensor transform (the inverse of `fun_m`)
+    [[0.]
+    [0.]
+    [1.]]]
+    >>> disp(test)
+    [[[1. 0. 0.]
+    [0. 1. 0.]
+    [0. 0. 1.]]]
     """
-
-    def M(X):
-        assert X.shape[-1] == t, f"Expecting last input dimension to be {t}"
-        return dct(X, type=2, n=t, axis=-1, norm="ortho", workers=2 * os.cpu_count())
-
-    def Minv(X):
-        assert X.shape[-1] == t, f"Expecting last input dimension to be {t}"
-        return idct(X, type=2, n=t, axis=-1, norm="ortho", workers=2 * os.cpu_count())
-
-    return M, Minv
+    assert len(tens.shape) == 3, "expecting tensor (order-3) array input!"
+    print(tens.transpose(2, 0, 1))
 
 
 def _singular_vals_mat_to_tensor(mat, n, p, t):

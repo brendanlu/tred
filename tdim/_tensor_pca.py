@@ -9,12 +9,9 @@ from numbers import Integral
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
-from ._base import RealNotInt, _facewise_product, m_product
-from ._utils import (
-    generate_DCTii_M_transform_pair,
-    _singular_vals_mat_to_tensor,
-    _singular_vals_tensor_to_mat,
-)
+from ._base import RealNotInt, _facewise_product, _m_product
+from ._utils import _singular_vals_mat_to_tensor, _singular_vals_tensor_to_mat
+from ._m_transforms import generate_DCTii_M_transform_pair
 
 
 def tsvdm(

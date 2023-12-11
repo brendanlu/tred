@@ -44,7 +44,7 @@ def _facewise_product(A, B):
     return np.matmul(A.transpose(2, 0, 1), B.transpose(2, 0, 1)).transpose(1, 2, 0)
 
 
-def m_product(A, B, M, Minv):
+def _m_product(A, B, M, Minv):
     """Kilmer et al. (2021) tensor m-product for order-3 tensors. See [1]
 
     Parameters
