@@ -172,28 +172,6 @@ class TPCA(BaseEstimator, TransformerMixin):
         self.Minv = Minv
 
     def fit(self, X, y=None):
-        self._fit(X)
-        return self
-
-    def transform(self, X):
-        pass
-
-    def inverse_transform(self, X):
-        pass
-
-    def fit_transform(self, X, y=None):
-        """Fit the model with X and apply the dimensionality reduction on X. 
-        """
-        self._fit(X)
-        return self._transform(X)
-
-    def _alternative_fit_transform(self, X, y=None):
-        """Try sklearn's PCA fit_transform method: 
-            $Z = X \times_M V = U \times_M S$
-        """
-        pass
-
-    def _fit(self, X):
         """Fit the model by computing the full SVD on X
         Implementation loosely modelled around _fit_full() method from sklearn's PCA.
 
@@ -232,14 +210,11 @@ class TPCA(BaseEstimator, TransformerMixin):
             svals_matrix_form=True,
         )
 
-        # we flatten out the compressed singular value matrix in Fortran memory style 
-        # (column-wise). tensor-wise, we can interpret this as stacking the horizontals
-        # of each tensor faces next to each other in the flattened array, where the 
+        # we flatten out the compressed singular value matrix in Fortran memory style
+        # (column-wise). tensor-wise, we can interpret this as stacking the diagonals
+        # of each tensor face in S next to each other in the flattened array, where the
         # singular values are grouped by face
-        # 
-        # see below, we store the .argsort() of this descending sort for picking out 
-        # the corresponding top components in the transformed data
-        singular_values_ = hatS_mat.flatten(order='F')
+        singular_values_ = hatS_mat.flatten(order="F")
         self._k_t_flatten_sort = singular_values_.argsort()[::-1]
         singular_values_ = singular_values_[self._k_t_flatten_sort]
 
@@ -307,13 +282,13 @@ class TPCA(BaseEstimator, TransformerMixin):
             "Our implementation is yet to appropriately handle this"
             "Please let us know, and either increase or decrease your n_components input"
         )
-
+        
         # perform multi-rank truncation, t should be modestly sized, so the for-loop
         # should be bearable
         for i in range(t):
-            hatU[:, : rho[i], i] = 0
-            hatS_mat[: rho[i], i] = 0
-            hatV[:, : rho[i], i] = 0
+            hatU[:, rho[i] :, i] = 0
+            hatS_mat[rho[i] :, i] = 0
+            hatV[:, rho[i] :, i] = 0
 
         self._hatV_ = hatV
 
@@ -324,9 +299,9 @@ class TPCA(BaseEstimator, TransformerMixin):
         self.explained_variance_ratio_ = explained_variance_ratio_[:n_components]
         self.singular_values_ = singular_values_[:n_components]
 
-        return hatU, hatS_mat, hatV
+        return self
 
-    def _transform(self, X):
+    def transform(self, X):
         """TCAM algorithm from Mor et al. (2022)"""
 
         check_is_fitted(self)
@@ -341,6 +316,23 @@ class TPCA(BaseEstimator, TransformerMixin):
         # tsvdm saving a pair of roundabout calls to M and Minv
         X_transformed = _facewise_product(self.M(X), self._hatV_)
 
-        # truncate the output
+        # now unfold the n x p x t tensor into a n x pt 2d array (matrix). first transpose 
+        # into a n-vertical-stack of t x p matrices. looking downwards, with C-memory
+        # layout, ravel followed by reshaping into a n x pt matrix gives the intended 
+        # result; the unfolding has the same tensor semantics as singular_values_ in the 
+        # fit method
+        X_transformed = X_transformed.transpose(0, 2, 1).reshape(
+            (X.shape[0], -1), order="C"
+        )
+        # now reorder the transformed feature space according to singular values ordering 
+        # from fit
+        X_transformed = X_transformed[:,self._k_t_flatten_sort]
+        return X_transformed[:,:self.n_components_]
 
-        return X_transformed
+    def inverse_transform(self, X):
+        """Potentially implemented in future"""
+        pass
+
+    def fit_transform(self, X, y=None):
+        """Fit the model with X and apply the dimensionality reduction on X."""
+        return self.fit(X).transform(X)
