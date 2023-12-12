@@ -258,9 +258,8 @@ class TPCA(BaseEstimator, TransformerMixin):
                 f"Got {type(self.n_components)} instead"
             )
 
-        # q := n_components
-        # this is the smallest singular value in the truncation
-        # EDGE CASE 1: singular_values_[n_components-1] == singular_values_[n_components]
+        """
+        # q := n_components - this is the smallest singular value in the truncation
         sigma_q = singular_values_[n_components - 1]
 
         # now we compute a representation of rho, of size t; see Mor et al. (2022)
@@ -275,23 +274,16 @@ class TPCA(BaseEstimator, TransformerMixin):
             axis=0,
             arr=hatS_mat,
         )
-        # add a funny error message for EDGE CASE 1, for now...
-        assert np.sum(rho) == n_components, (
-            "Ah, you are the first unlucky person to run into a rare edge case"
-            "This is because your singular values tensor contains tied singular values"
-            "Our implementation is yet to appropriately handle this"
-            "Please let us know, and either increase or decrease your n_components input"
-        )
         
         # perform multi-rank truncation, t should be modestly sized, so the for-loop
         # should be bearable
         for i in range(t):
-            hatU[:, rho[i] :, i] = 0
-            hatS_mat[rho[i] :, i] = 0
-            hatV[:, rho[i] :, i] = 0
+            hatU[:, rho[i]:, i] = 0
+            hatS_mat[rho[i]:, i] = 0
+            hatV[:, rho[i]:, i] = 0
+        """
 
         self._hatV_ = hatV
-
         # store useful attributes; as per sklearn conventions, we use trailing underscores
         # to indicate that they have been populated following a call to fit()
         self.n_, self.p_, self.t_ = n, p, t
@@ -326,8 +318,7 @@ class TPCA(BaseEstimator, TransformerMixin):
         )
         # now reorder the transformed feature space according to singular values ordering 
         # from fit
-        X_transformed = X_transformed[:,self._k_t_flatten_sort]
-        return X_transformed[:,:self.n_components_]
+        return X_transformed[:,self._k_t_flatten_sort[:self.n_components_]]
 
     def inverse_transform(self, X):
         """Potentially implemented in future"""
