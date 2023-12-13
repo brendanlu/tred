@@ -178,7 +178,46 @@ class TPCA(BaseEstimator, TransformerMixin):
         In the future, we could potentially explore different svd solvers which lets one
         directly pass truncation specifications into the low-level solver...?
         """
+        self._fit(X)
+        return self
 
+    def transform(self, X):
+        """TCAM algorithm from Mor et al. (2022)"""
+
+        check_is_fitted(self)
+        assert len(X.shape) == 3, "Ensure order-3 tensor input"
+        assert (
+            X.shape[1] == self.p_ and X.shape[2] == self.t_
+        ), "Ensure the number of features, and time points, matches the model fit data"
+
+        # in the interest of efficiency, V was returned in the m-transformed space from
+        # tsvdm saving a pair of roundabout calls to M and Minv, and pick out the top
+        # i_q and j_q indexes, as notated in Mor et al. (2022)
+        return _facewise_product(self.M(X - self.mean_), self._hatV)[
+            :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
+        ]
+
+    def inverse_transform(self, X):
+        """Potentially implemented in future"""
+        pass
+
+    def fit_transform(self, X, y=None):
+        """Fit the model with X and apply the dimensionality reduction on X."""
+        return self.fit(X).transform(X)
+
+    def alternative_fit_transform(self, X, y=None):
+        """Benchmark alternative approach as taken by sklearn.
+            Z = A *_M V = U *_M S
+        Compute the final term instead of the intermediate one
+        """
+        # note that these tensors do NOT have full face-wise matrices
+        hatU, hatS_mat, _ = self._fit(X)
+        hatS = _singular_vals_mat_to_tensor(hatS_mat, self.n_, self.k_, self.t_)
+        return _facewise_product(hatU, hatS)[
+            :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
+        ]
+
+    def _fit(self, X):
         assert not (
             callable(self.M) ^ callable(self.Minv)
         ), "If explicitly defined, both M and its inverse must be defined"
@@ -273,33 +312,9 @@ class TPCA(BaseEstimator, TransformerMixin):
 
         # store public attributes; as per sklearn conventions, we use trailing underscores
         # to indicate that they have been populated following a call to fit()
-        self.n_, self.p_, self.t_ = n, p, t
+        self.n_, self.p_, self.t_, self.k_ = n, p, t, k
         self.n_components_ = n_components
         self.explained_variance_ratio_ = explained_variance_ratio_[:n_components]
         self.singular_values_ = singular_values_[:n_components]
 
-        return self
-
-    def transform(self, X):
-        """TCAM algorithm from Mor et al. (2022)"""
-
-        check_is_fitted(self)
-        assert len(X.shape) == 3, "Ensure order-3 tensor input"
-        assert (
-            X.shape[1] == self.p_ and X.shape[2] == self.t_
-        ), "Ensure the number of features, and time points, matches the model fit data"
-
-        # in the interest of efficiency, V was returned in the m-transformed space from
-        # tsvdm saving a pair of roundabout calls to M and Minv, and pick out the top
-        # i_q and j_q indexes, as notated in Mor et al. (2022)
-        return _facewise_product(self.M(X - self.mean_), self._hatV)[
-            :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
-        ]
-
-    def inverse_transform(self, X):
-        """Potentially implemented in future"""
-        pass
-
-    def fit_transform(self, X, y=None):
-        """Fit the model with X and apply the dimensionality reduction on X."""
-        return self.fit(X).transform(X)
+        return hatU, hatS_mat, hatV

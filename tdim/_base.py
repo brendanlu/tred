@@ -65,8 +65,9 @@ def _m_product(A, B, M, Minv):
 def _rank_q_truncation_zero_out(hatU, hatS, hatV, q):
     """Explicit rank-q truncation as in Mor et al. (2022)
 
-    NOTE: NOT USED so far in this package. We do not need to truncate the matrix as
-    we can simply select the top components that we need. [UNTESTED]
+    NOTE: NOT USED so far in this package. We do not need to truncate the tSVDM matrices,
+    because it is more efficient to just simply select the top components that we need.
+    + [UNTESTED]
     """
     # assume hatS in matrix form
     if len(hatS.shape) == 3:
