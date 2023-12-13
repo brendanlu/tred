@@ -197,18 +197,19 @@ class TPCA(BaseEstimator, TransformerMixin):
             :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
         ]
 
-    def inverse_transform(self, X):
-        """Potentially implemented in future"""
-        pass
-
     def fit_transform(self, X, y=None):
-        """Fit the model with X and apply the dimensionality reduction on X."""
-        return self.fit(X).transform(X)
+        """Fit the model with X and apply the dimensionality reduction on X.
+        
+        The tensor m-product from Kilmer et al. (2021) has a notion of tensor inverse, 
+        and tensor orthogonality. 
 
-    def alternative_fit_transform(self, X, y=None):
-        """Benchmark alternative approach as taken by sklearn.
-            Z = A *_M V = U *_M S
-        Compute the final term instead of the intermediate one
+        Benchmark alternative approach as taken by sklearn in their PCA class. If we 
+        right multiply A's tSVDM by $V$ we note that it cancels the $V^T$ giving us 
+            $Z = A *_M V = U *_M S$
+        
+        Our benchmarking shoes it is much more computationally efficient to compute the
+        final term, even if we have to convert $S$ into its full (sparse) tensor
+        representation. 
         """
         # note that these tensors do NOT have full face-wise matrices
         hatU, hatS_mat, _ = self._fit(X)
@@ -216,6 +217,10 @@ class TPCA(BaseEstimator, TransformerMixin):
         return _facewise_product(hatU, hatS)[
             :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
         ]
+    
+    def inverse_transform(self, X):
+        """Potentially implemented in future"""
+        pass
 
     def _fit(self, X):
         assert not (
