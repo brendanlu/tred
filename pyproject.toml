@@ -1,0 +1,23 @@
+[project]
+name = "tred"
+version = "0.0.1"
+authors = [
+  { name="Brendan Lu", email="brendannlu5@gmail.com" },
+]
+description = "Dimensionality reduction techniques for order-3 tensors"
+readme = "README.txt"
+requires-python = ">=3.8"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: BSD License",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.urls]
+Homepage = "https://github.com/brendanlu/tred"
+Issues = "https://github.com/brendanlu/tred/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

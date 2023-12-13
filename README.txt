@@ -1,3 +1,5 @@
+TRED
+----
 Credit inspiration for our package: https://github.com/UriaMorP/mprod_package
 
 For the underlying tensor-product framework and tensor t-SVDM, see [1]. 
