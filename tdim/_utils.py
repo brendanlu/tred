@@ -102,6 +102,5 @@ def _singular_vals_tensor_to_mat(tensor):
     # assertion checks if they are equal 
     assert(np.array_equal(mat, np.diagonal(tensor, axis1=0, axis2=1).transpose()))
     """
-
     # but we implement using one of the various numpy tricks
     return np.diagonal(tensor, axis1=0, axis2=1).transpose()

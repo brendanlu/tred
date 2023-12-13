@@ -258,33 +258,20 @@ class TPCA(BaseEstimator, TransformerMixin):
                 f"Got {type(self.n_components)} instead"
             )
 
-        """
-        # q := n_components - this is the smallest singular value in the truncation
-        sigma_q = singular_values_[n_components - 1]
-
-        # now we compute a representation of rho, of size t; see Mor et al. (2022)
-        # each diagonal of the frontal slice is already sorted in decreasing order
-        # np.searchsorted is called on each column, reversed so that it is ascending,
-        # where it returns the index i
-        #   s.t. sigma_q <= ascending_col[i] (see numpy searchsorted docs)
-        # which mean that we want to discard the i smallest values, and keep the other
-        # k-i, which is the number we store in rho
-        rho = np.apply_along_axis(
-            lambda col: k - np.searchsorted(col[::-1], sigma_q, side="left"),
-            axis=0,
-            arr=hatS_mat,
+        # we store the features tensor, in the tSVDM decomposition, in the transforemd
+        # space, saving roundabout calls to M and Minv when performing m-product with new
+        # data
+        self._hatV = hatV
+        # now convert the argsort indexes back into the two dimensional indexes. in the
+        # same tensor semantics as hatS_mat, the rows (tuple[0]) in this multindex
+        # correspond to the p-dimension location, and the columns (tuple[1]) in the
+        # multindex correspond to the t-dimension location. these are now the collection
+        # of i_h's and j_h's in Mor et al. (2022)
+        self._k_t_flatten_sort = np.unravel_index(
+            self._k_t_flatten_sort[:n_components], shape=hatS_mat.shape, order="F"
         )
-        
-        # perform multi-rank truncation, t should be modestly sized, so the for-loop
-        # should be bearable
-        for i in range(t):
-            hatU[:, rho[i]:, i] = 0
-            hatS_mat[rho[i]:, i] = 0
-            hatV[:, rho[i]:, i] = 0
-        """
 
-        self._hatV_ = hatV
-        # store useful attributes; as per sklearn conventions, we use trailing underscores
+        # store public attributes; as per sklearn conventions, we use trailing underscores
         # to indicate that they have been populated following a call to fit()
         self.n_, self.p_, self.t_ = n, p, t
         self.n_components_ = n_components
@@ -303,20 +290,11 @@ class TPCA(BaseEstimator, TransformerMixin):
         ), "Ensure the number of features, and time points, matches the model fit data"
 
         # in the interest of efficiency, V was returned in the m-transformed space from
-        # tsvdm saving a pair of roundabout calls to M and Minv
-        X_transformed = _facewise_product(self.M(X - self.mean_), self._hatV_)
-
-        # now unfold the n x p x t tensor into a n x pt 2d array (matrix). first transpose 
-        # into a n-vertical-stack of t x p matrices. looking downwards, with C-memory
-        # layout, ravel followed by reshaping into a n x pt matrix gives the intended 
-        # result; the unfolding has the same tensor semantics as singular_values_ in the 
-        # fit method
-        X_transformed = X_transformed.transpose(0, 2, 1).reshape(
-            (X.shape[0], -1), order="C"
-        )
-        # now reorder the transformed feature space according to singular values ordering 
-        # from fit
-        return X_transformed[:,self._k_t_flatten_sort[:self.n_components_]]
+        # tsvdm saving a pair of roundabout calls to M and Minv, and pick out the top
+        # i_q and j_q indexes, as notated in Mor et al. (2022)
+        return _facewise_product(self.M(X - self.mean_), self._hatV)[
+            :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
+        ]
 
     def inverse_transform(self, X):
         """Potentially implemented in future"""
