@@ -13,6 +13,9 @@ classifiers = [
   "Operating System :: OS Independent",
   "Topic :: Scientific/Engineering :: Mathematics",
 ]
+dependencies = [
+  "scikit-learn>=1.3.2"
+]
 
 [project.urls]
 Homepage = "https://github.com/brendanlu/tred"
