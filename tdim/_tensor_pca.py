@@ -302,11 +302,9 @@ class TPCA(BaseEstimator, TransformerMixin):
             X.shape[1] == self.p_ and X.shape[2] == self.t_
         ), "Ensure the number of features, and time points, matches the model fit data"
 
-        # center the data, creating a new copy of X
-        X = X - self.mean_
         # in the interest of efficiency, V was returned in the m-transformed space from
         # tsvdm saving a pair of roundabout calls to M and Minv
-        X_transformed = _facewise_product(self.M(X), self._hatV_)
+        X_transformed = _facewise_product(self.M(X - self.mean_), self._hatV_)
 
         # now unfold the n x p x t tensor into a n x pt 2d array (matrix). first transpose 
         # into a n-vertical-stack of t x p matrices. looking downwards, with C-memory
