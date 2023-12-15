@@ -12,8 +12,8 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from ._ops import RealNotInt, _facewise_product, _m_product
-from ._utils import _singular_vals_mat_to_tensor, _singular_vals_tensor_to_mat
+from ._tensor_ops import _facewise_product
+from ._utils import RealNotInt, _singular_vals_mat_to_tensor
 from ._m_transforms import generate_DCTii_M_transform_pair
 
 
@@ -252,7 +252,24 @@ class TPCA(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        """TCAM algorithm from Mor et al. (2022)"""
+        """Apply dimensionality reduction to X.
+
+        See the TCAM algorithm from Mor et al. (2022)
+
+        Parameters
+        ----------
+        X : ArrayLike of shape (n, p, t)
+            Training data, where `n` is the number of samples, `p` is the number of
+            features, as `t` is the number of time points.
+
+        y : Ignored
+            Ignored.
+
+        Returns
+        -------
+        X_transformed : ndarray of shape (n, n_components)
+            TCAM projections in 2D transformed space.
+        """
 
         check_is_fitted(self)
         assert len(X.shape) == 3, "Ensure order-3 tensor input"
@@ -270,16 +287,40 @@ class TPCA(BaseEstimator, TransformerMixin):
     def fit_transform(self, X, y=None):
         """Fit the model with X and apply the dimensionality reduction on X.
 
+        The output here will not be identical to calling fix(X).transform(X). But, the
+        two give the same results up to machine precision. We provide a brief discussion
+        of this below.
+
+        Parameters
+        ----------
+        X : ArrayLike of shape (n, p, t)
+            Training data, where `n` is the number of samples, `p` is the number of
+            features, as `t` is the number of time points.
+
+        y : Ignored
+            Ignored.
+
+        Returns
+        -------
+        X_transformed : ndarray of shape (n, n_components)
+            TCAM projections in 2D transformed space.
+
+        Notes
+        -----
         The tensor m-product from Kilmer et al. (2021) has a notion of tensor inverse,
         and tensor orthogonality.
 
-        Benchmark alternative approach as taken by sklearn in their PCA class. If we
-        right multiply A's tSVDM by $V$ we note that it cancels the $V^T$ giving us
+        We benchmarked an alternative approach as taken by sklearn in their PCA class. If
+        we right multiply A's tSVDM by $V$ we note that it cancels the $V^T$ giving us
             $Z = A *_M V = U *_M S$
+        It appears that computing the final term is more computationally efficient, even
+        if we have to convert $S$ into its full (sparse) tensor representation.
 
-        Our benchmarking shoes it is much more computationally efficient to compute the
-        final term, even if we have to convert $S$ into its full (sparse) tensor
-        representation.
+        By contrast, transform(X) will simply compute
+            $Z = A *_M V$
+
+        $Z$ needs to be converted by $\times_3 M$ and 'compressed' before being returned.
+        For these details see Mor et al. (2022)
         """
         # note that these tensors do NOT have full face-wise matrices
         hatU, hatS_mat, _ = self._fit(X)

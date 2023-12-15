@@ -1,4 +1,4 @@
-"""General utility functions, loosely: computational utilities"""
+"""Miscallaneous utilities"""
 
 from numbers import Real
 import numpy as np

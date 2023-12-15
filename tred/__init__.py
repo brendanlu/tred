@@ -12,4 +12,4 @@ from ._m_transforms import generate_DCTii_M_transform_pair
 # We let users access these utilities and operations if they so wish. In the future, we
 # may mark many of these as public
 from ._utils import _singular_vals_mat_to_tensor, _singular_vals_tensor_to_mat
-from ._ops import _m_product, _mode0_unfold
+from ._tensor_ops import _m_product, _mode0_unfold
