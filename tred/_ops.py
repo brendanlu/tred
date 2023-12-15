@@ -1,24 +1,9 @@
 """Module with mathematical operations"""
 
 
-from numbers import Real
 import numpy as np
 
 from ._utils import _singular_vals_tensor_to_mat
-
-
-class RealNotInt(Real):
-    """A type that represents non-integer real numbers.
-
-    [COPIED] From sklearn/utils/_param_validation.py
-
-    Behaves like float, but also works with values extracted from numpy arrays.
-    isintance(1, RealNotInt) -> False
-    isinstance(1.0, RealNotInt) -> True
-    """
-
-
-RealNotInt.register(float)
 
 
 def _facewise_product(A, B):

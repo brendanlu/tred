@@ -1,7 +1,9 @@
-"""In development...
-We want to give appropriate credit to https://github.com/UriaMorP/mprod_package; we are 
-rewriting the key implementations ourselves to better suit our purposes, and future 
-development we are interested in.
+"""Tensor Component Analysis based on the TCAM algorithm and tensor m-product.
+
+We want to give appropriate credit to https://github.com/UriaMorP/mprod_package for 
+existing implementations of algorithms in this module; we are rewriting the key 
+implementations ourselves to better suit our purposes, and future development we are 
+interested in.
 """
 
 
@@ -39,7 +41,6 @@ def _generate_default_m_transform_pair(t):
         inv_m : Callable[[ArrayLike], ndarray]
             A tensor transform (the inverse of `fun_m`)
     """
-
     # as introduced by Kilmer et al. (2021) and applied by Mor et al. (2022), we currently
     # use the Discrete Cosine transform
     # see https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html
@@ -149,7 +150,7 @@ def tsvdm(
 class TPCA(BaseEstimator, TransformerMixin):
     """t-SVDM tensor analogue of PCA using explicit rank truncation with explicit rank
     truncation from Mor et al. (2022), and underlying m-product framework from Kilmer et
-    al. (2021). Takes in an $n \times p \times t$ input tensor, and transforms into 
+    al. (2021). Takes in an $n \times p \times t$ input tensor, and transforms into
     a $n \times$ `n_components` matrix of 2D transformed loadings.
 
     The input tensor is centred into Mean Deviation Form (by location), but not normalized
@@ -161,62 +162,62 @@ class TPCA(BaseEstimator, TransformerMixin):
         Control number of components to keep. If n_components is not set at all, or set
         to `None`, ``n_components == min(n, p) * t``
 
-        If `n_components` is an integer, the TPCA will return the number of loadings, 
-        provided that for the tensor data passed into `fit`, satisfies 
-        ``1 <= n_components <= min(n, p) * t`` 
+        If `n_components` is an integer, the TPCA will return the number of loadings,
+        provided that for the tensor data passed into `fit`, satisfies
+        ``1 <= n_components <= min(n, p) * t``
 
         If ``0 < n_components < 1``, TPCA will select the number of compononents such that
         the amount of variance that needs to be explained is greater than the percentage
-        specified. 
-    
+        specified.
+
     copy : bool, default=True
-        If False, data passed to fit are overwritten and running fit(X).transform(X) will 
+        If False, data passed to fit are overwritten and running fit(X).transform(X) will
         not yield the expected results. Use fit_transform(X) instead.
 
     M : Callable[[ArrayLike], ndarray] or None, default=None
         A function which, given some order-3 tensor, returns it under some $\times_3$
         invertible transformation. If unspecified TPCA will use the Discrete Consine
-        Transform (ii) from scipy fft. 
+        Transform (ii) from scipy fft.
 
     MInv : Callable[[ArrayLike], ndarray] or None, default=None
-        The inverse transformation of M. 
+        The inverse transformation of M.
 
     Attributes
     ----------
     n_, p_, t_, k_ : int
         The dimensions of the training data. ``k_ == min(n_, p_)``
-    
-    n_components_ : int 
-        The estimated number of components. If `n_components` was explicitly set by an 
-        integer value, this will be the same as that. If `n_components` was a number 
-        between 0 and 1, this number is estimated from input data. Otherwise, if not set 
-        (defaults to None), it will default to $k \times t$ in the training data. 
+
+    n_components_ : int
+        The estimated number of components. If `n_components` was explicitly set by an
+        integer value, this will be the same as that. If `n_components` was a number
+        between 0 and 1, this number is estimated from input data. Otherwise, if not set
+        (defaults to None), it will default to $k \times t$ in the training data.
 
     explained_variance_ratio_ : ndarray of shape (n_components_,)
         Percentage of total variance explained by each of the selected components. The
-        selected components are selected so that this is returned in descending order. 
+        selected components are selected so that this is returned in descending order.
 
-        If ``n_components`` is not set then all components are stored and the sum of this 
-        ratios array is equal to 1.0. 
-    
+        If ``n_components`` is not set then all components are stored and the sum of this
+        ratios array is equal to 1.0.
+
     singular_values_ : ndarray of shape (n_components,)
-        The singular values corresponding to each of the selected components. 
+        The singular values corresponding to each of the selected components.
 
     mean_ : ndarray of shape(p_, t_)
-        Per-feature, per-timepoint empirical mean, estimated from the training set. 
-        This is used to normalize any new data passed to transform(X). 
+        Per-feature, per-timepoint empirical mean, estimated from the training set.
+        This is used to normalize any new data passed to transform(X).
 
     References
     ----------
-    For the underlying m-product algebra in which the tensor analogue of SVD, and 
+    For the underlying m-product algebra in which the tensor analogue of SVD, and
     therefore PCA is formulated, see:
-    `Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor 
-    algebra for optimal representation and compression of multiway data. Proceedings 
+    `Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor
+    algebra for optimal representation and compression of multiway data. Proceedings
     of the National Academy of Sciences, 118(28), p.e2015851118.`
 
     Implements the TCAM model from
-    `Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron, 
-    H., 2022. Dimensionality reduction of longitudinal’omics data using modern 
+    `Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron,
+    H., 2022. Dimensionality reduction of longitudinal’omics data using modern
     tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.`
 
     See also: https://github.com/UriaMorP/mprod_package
