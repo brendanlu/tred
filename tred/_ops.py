@@ -1,4 +1,4 @@
-"""Base module, loosely: mathematical utilities"""
+"""Module with mathematical operations"""
 
 
 from numbers import Real
@@ -26,10 +26,10 @@ def _facewise_product(A, B):
 
     Parameters
     ----------
-    A : ArrayLike
+    A : ArrayLike of shape (a, b, d)
         $a \times b \times d$ tensor representation
 
-    B : ArrayLike
+    B : ArrayLike of shape (b, c, d)
         $b \times c \times d$ tensor representation
 
     Returns

@@ -12,4 +12,4 @@ from ._m_transforms import generate_DCTii_M_transform_pair
 
 # for testing ----------------------------------------------------------------------------
 from ._utils import _singular_vals_mat_to_tensor, _singular_vals_tensor_to_mat
-from ._base import _m_product
+from ._ops import _m_product, _mode0_unfold

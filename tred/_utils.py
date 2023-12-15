@@ -45,7 +45,7 @@ def _singular_vals_mat_to_tensor(mat, n, p, t):
 
     Parameters
     ----------
-        mat : ArrayLike, shape: (k, t_)
+        mat : ArrayLike of shape (k, t_)
             $k \times t_$ matrix representation, the function checks if `t_ == t`
 
         n : int
@@ -59,7 +59,7 @@ def _singular_vals_mat_to_tensor(mat, n, p, t):
 
     Returns
     -------
-        hatS : ndarray, shape: (n, p, t)
+        hatS : ndarray of shape: (n, p, t)
             $n \times p \times t$ tensor representation
     """
     k = min(n, p)
@@ -81,26 +81,24 @@ def _singular_vals_tensor_to_mat(tensor):
 
     Parameters
     ----------
-        tensor : ArrayLike, shape: (n, p, t)
+        tensor : ArrayLike of shape: (n, p, t)
             $n \times p \times t$ tensor representation
 
     Returns
     -------
-        mat : ndarray, shape: (min(n, p), t)
+        mat : ndarray of shape: (min(n, p), t)
             $k \times t$ matrix representation of singular values, where
             $k = \min{(n,p)}$
-    """
 
+    Reference
+    ---------
+    For reference, below is a mathematically clearer illustration of this function
+    NOTE: It is a code snippet it will not actually run, treat as pseudo-code
+    >>> n, p, t = tensor.shape
+    >>> k = min(n, p)
+    >>> mat = np.zeros((k, t))
+    >>> for i in range(t):
+    >>>     mat[:, i] = np.diagonal(tensor[:, :, i])
     """
-    # for reference, below is the more mathematically interpretable version
-    n, p, t = tensor.shape
-    k = min(n, p)
-    mat = np.zeros((k, t))
-    for i in range(t):
-        mat[:, i] = np.diagonal(tensor[:, :, i])
-
-    # assertion checks if they are equal 
-    assert(np.array_equal(mat, np.diagonal(tensor, axis1=0, axis2=1).transpose()))
-    """
-    # but we implement using one of the various numpy tricks
+    # implement using one of the various numpy tricks
     return np.diagonal(tensor, axis1=0, axis2=1).transpose()

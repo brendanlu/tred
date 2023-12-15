@@ -10,7 +10,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from ._base import RealNotInt, _facewise_product, _m_product
+from ._ops import RealNotInt, _facewise_product, _m_product
 from ._utils import _singular_vals_mat_to_tensor, _singular_vals_tensor_to_mat
 from ._m_transforms import generate_DCTii_M_transform_pair
 
@@ -92,11 +92,11 @@ def tsvdm(
 
     Returns
     -------
-        U_tens : ndarray, shape: (n, n, t) if full_matrices else (n, k, t)
+        U_tens : ndarray, shape: (n, n, t) if full_frontal_slices==True else (n, k, t)
 
-        S_tens : ndarray, shape: (n, p, t) if not compact_svals else (k, t)
+        S_tens : ndarray, shape: (n, p, t) if svals_matrix_form==False else (k, t)
 
-        V_tens : ndarray, shape: (p, p, t) if full_matrices else (p, k, t)
+        V_tens : ndarray, shape: (p, p, t) if full_frontal_slices==True else (p, k, t)
     """
 
     assert not (
@@ -149,34 +149,103 @@ def tsvdm(
 class TPCA(BaseEstimator, TransformerMixin):
     """t-SVDM tensor analogue of PCA using explicit rank truncation with explicit rank
     truncation from Mor et al. (2022), and underlying m-product framework from Kilmer et
-    al. (2021).
+    al. (2021). Takes in an $n \times p \times t$ input tensor, and transforms into 
+    a $n \times$ `n_components` matrix of 2D transformed loadings.
 
-    In the future, different svd solvers and truncation methods will likely be
-    implemented here.
-
-    Mirrors API and implementation of sklearn/decomposition/_pca.py for matrix data, as
-    much as possible.
+    The input tensor is centred into Mean Deviation Form (by location), but not normalized
+    (by scale).
 
     Parameters
     ----------
+    n_components : int, float, or None, default=None
+        Control number of components to keep. If n_components is not set at all, or set
+        to `None`, ``n_components == min(n, p) * t``
+
+        If `n_components` is an integer, the TPCA will return the number of loadings, 
+        provided that for the tensor data passed into `fit`, satisfies 
+        ``1 <= n_components <= min(n, p) * t`` 
+
+        If ``0 < n_components < 1``, TPCA will select the number of compononents such that
+        the amount of variance that needs to be explained is greater than the percentage
+        specified. 
+    
+    copy : bool, default=True
+        If False, data passed to fit are overwritten and running fit(X).transform(X) will 
+        not yield the expected results. Use fit_transform(X) instead.
+
+    M : Callable[[ArrayLike], ndarray] or None, default=None
+        A function which, given some order-3 tensor, returns it under some $\times_3$
+        invertible transformation. If unspecified TPCA will use the Discrete Consine
+        Transform (ii) from scipy fft. 
+
+    MInv : Callable[[ArrayLike], ndarray] or None, default=None
+        The inverse transformation of M. 
 
     Attributes
     ----------
+    n_, p_, t_, k_ : int
+        The dimensions of the training data. ``k_ == min(n_, p_)``
+    
+    n_components_ : int 
+        The estimated number of components. If `n_components` was explicitly set by an 
+        integer value, this will be the same as that. If `n_components` was a number 
+        between 0 and 1, this number is estimated from input data. Otherwise, if not set 
+        (defaults to None), it will default to $k \times t$ in the training data. 
 
+    explained_variance_ratio_ : ndarray of shape (n_components_,)
+        Percentage of total variance explained by each of the selected components. The
+        selected components are selected so that this is returned in descending order. 
+
+        If ``n_components`` is not set then all components are stored and the sum of this 
+        ratios array is equal to 1.0. 
+    
+    singular_values_ : ndarray of shape (n_components,)
+        The singular values corresponding to each of the selected components. 
+
+    mean_ : ndarray of shape(p_, t_)
+        Per-feature, per-timepoint empirical mean, estimated from the training set. 
+        This is used to normalize any new data passed to transform(X). 
+
+    References
+    ----------
+    For the underlying m-product algebra in which the tensor analogue of SVD, and 
+    therefore PCA is formulated, see:
+    `Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor 
+    algebra for optimal representation and compression of multiway data. Proceedings 
+    of the National Academy of Sciences, 118(28), p.e2015851118.`
+
+    Implements the TCAM model from
+    `Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron, 
+    H., 2022. Dimensionality reduction of longitudinal’omics data using modern 
+    tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.`
+
+    See also: https://github.com/UriaMorP/mprod_package
     """
 
     def __init__(self, n_components=None, copy=True, *, M=None, Minv=None):
+        # as per sklearn conventions, we perform any and all parameter validation inside
+        # fit, and none in __init__
         self.n_components = n_components
         self.copy = copy
         self.M = M
         self.Minv = Minv
 
     def fit(self, X, y=None):
-        """Fit the model by computing the full SVD on X
-        Implementation loosely modelled around _fit_full() method from sklearn's PCA.
+        """Fit the model with X.
 
-        In the future, we could potentially explore different svd solvers which lets one
-        directly pass truncation specifications into the low-level solver...?
+        Parameters
+        ----------
+        X : ArrayLike of shape (n, p, t)
+            Training data, where `n` is the number of samples, `p` is the number of
+            features, as `t` is the number of time points.
+
+        y : Ignored
+            Ignored.
+
+        Returns
+        -------
+        self : object
+            Returns the instance itself, after being fitted.
         """
         self._fit(X)
         return self
@@ -199,17 +268,17 @@ class TPCA(BaseEstimator, TransformerMixin):
 
     def fit_transform(self, X, y=None):
         """Fit the model with X and apply the dimensionality reduction on X.
-        
-        The tensor m-product from Kilmer et al. (2021) has a notion of tensor inverse, 
-        and tensor orthogonality. 
 
-        Benchmark alternative approach as taken by sklearn in their PCA class. If we 
-        right multiply A's tSVDM by $V$ we note that it cancels the $V^T$ giving us 
+        The tensor m-product from Kilmer et al. (2021) has a notion of tensor inverse,
+        and tensor orthogonality.
+
+        Benchmark alternative approach as taken by sklearn in their PCA class. If we
+        right multiply A's tSVDM by $V$ we note that it cancels the $V^T$ giving us
             $Z = A *_M V = U *_M S$
-        
+
         Our benchmarking shoes it is much more computationally efficient to compute the
         final term, even if we have to convert $S$ into its full (sparse) tensor
-        representation. 
+        representation.
         """
         # note that these tensors do NOT have full face-wise matrices
         hatU, hatS_mat, _ = self._fit(X)
@@ -217,12 +286,13 @@ class TPCA(BaseEstimator, TransformerMixin):
         return _facewise_product(hatU, hatS)[
             :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
         ]
-    
-    def inverse_transform(self, X):
-        """Potentially implemented in future"""
-        pass
 
     def _fit(self, X):
+        """Fit the model by computing the full SVD on X. Implementation loosely modelled
+        around _fit_full() method from sklearn's PCA. In the future, we could potentially
+        explore different svd solvers which lets one directly pass truncation
+        specifications into the low-level solver...?
+        """
         assert not (
             callable(self.M) ^ callable(self.Minv)
         ), "If explicitly defined, both M and its inverse must be defined"
@@ -290,11 +360,11 @@ class TPCA(BaseEstimator, TransformerMixin):
                     "For non-integer inputs, ensure that 0 < n_components < 1"
                 )
         elif isinstance(self.n_components, Integral):
-            if 0 <= self.n_components <= k:
+            if 1 <= self.n_components <= k * t:
                 n_components = self.n_components
             else:
                 raise ValueError(
-                    f"For integer inputs, ensure that 0 <= n_components <= min(n, p)={k}"
+                    f"Integer inputs must satisfy 1 <= n_components <= min(n, p)*t={k*t}"
                 )
         else:
             raise TypeError(

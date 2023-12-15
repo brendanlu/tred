@@ -22,10 +22,10 @@ of the National Academy of Sciences, 118(28), p.e2015851118.
 H., 2022. Dimensionality reduction of longitudinal’omics data using modern 
 tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.
 
-NOTE: The original authors use m, p, n as the dimensions of the tensors, in 
-literature, whereas throughout this package one will see we prefer n, p, t 
-instead. We will also use k = min(n, p), where from an `omics analysis 
-perspective, typically means k = n. 
+NOTE: In literature, the authors use m, p, n as the dimensions of the tensors, 
+whereas throughout this package one will see we prefer n, p, t instead. We will 
+also use k = min(n, p), where from an `omics analysis perspective, typically 
+means k = n, as p >> n typically. 
 
 Development
 -----------
@@ -41,17 +41,16 @@ Credit
 ------
 Our implementation was inspired by analogues at 
     https://github.com/scikit-learn/scikit-learn
-
-And loosely by
+And also by 
     https://github.com/UriaMorP/mprod_package
 
-Although we have placed a heavy emphasis on mathematical interpretability of the 
+Future
+------
+We have placed a heavy emphasis on mathematical interpretability of the 
 source code and computational efficiency (within the constraints of our 
 dependencies) to fit within highly iterative machine-learning and statistical 
 analysis workflows. 
 
-Future
-------
-New experimental methods may be added to tred. Users are highly encouraged to
-visit the GitHub site, and open issues. We are very interested in optimizing the 
-efficiency of the existing implementations if the need arises. 
+New experimental methods may also be added to tred. Users are highly encouraged 
+to visit the GitHub site, and open issues. We are very interested in optimizing 
+the efficiency of the existing implementations if the need arises. 
