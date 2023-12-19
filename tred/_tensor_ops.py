@@ -36,9 +36,23 @@ def _m_product(A, B, M, Minv):
 
     Parameters
     ----------
+    A : ArrayLike of shape (a, b, d)
+        $a \times b \times d$ tensor representation
+
+    B : ArrayLike of shape (b, c, d)
+        $b \times c \times d$ tensor representation
+
+    M : Callable[[ArrayLike], ndarray]
+        A function which, given some order-3 tensor, returns it under some $\times_3$
+        invertible transformation.
+
+    MInv : Callable[[ArrayLike], ndarray]
+        The inverse transformation of M
 
     Returns
     -------
+    m_product : ndarray, shape: (a, c, d)
+        Tensor-tensor m-product as found in Kilmer et al. (2021)
     """
     assert (
         A.shape[1] == B.shape[0] and A.shape[2] == B.shape[2]

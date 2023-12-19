@@ -113,8 +113,7 @@ def tsvdm(
     # an appropriate transposition allows Numpys array broadcasting to work appropriately
     # S_mat contains the singular values per matrix in the input matrix 'stack'
     # we reshape into a sparse tensor
-    #
-    # the transpose tensor stacks top to bottom, with t horizontal slices of size n by p
+    # (the transpose tensor stacks top to bottom, with t horizontal slices of size n by p)
     U_stack, S_mat, Vt_stack = np.linalg.svd(
         hatA.transpose(2, 0, 1), full_matrices=full_frontal_slices
     )

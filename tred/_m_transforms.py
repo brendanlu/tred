@@ -18,11 +18,11 @@ def generate_DCTii_M_transform_pair(t):
 
     Returns
     -------
-        fun_m : Callable[[ArrayLike], ndarray]
+        M : Callable[[ArrayLike], ndarray]
             A function which expects an order-3 tensor as input, and applies DCT-II to
             each of the tubal fibres. This preserves the dimensions of the tensor.
 
-        inv_m : Callable[[ArrayLike], ndarray]
+        Minv : Callable[[ArrayLike], ndarray]
             A tensor transform (the inverse of `fun_m`)
     """
 
