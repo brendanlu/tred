@@ -212,10 +212,14 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
     singular_values_ : ndarray of shape (n_components,)
         The singular values corresponding to each of the selected components.
 
-    mean_ : ndarray of shape(p_, t_)
+    mean_ : ndarray of shape (p_, t_)
         Per-feature, per-timepoint empirical mean, estimated from the training set.
         This is used to normalize any new data passed to transform(X), unless centre
         is explicitly turned off via ``centre==False`` during object instantiation.
+    
+    rho_ : ndarray of shape (t,)
+        The rho used in multi-rank truncation to achieve the desired explicit rank of 
+        ``n_components``. See Kilmer et al. (2021) tSVDMii and Mor et al. (2022)
 
     References
     ----------
@@ -363,7 +367,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         self.mean_ = np.mean(X, axis=0)
         if self.copy:
             X = X.copy()
-        if self.center:
+        if self.centre:
             X -= self.mean_
 
         # if there is no explicitly defined transform in __init__, assign functions to
@@ -443,7 +447,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         )
 
         # perform truncation. this speeds up subsequent calls to transform
-        _rank_q_truncation_zero_out(
+        rho = _rank_q_truncation_zero_out(
             hatU, hatS_mat, hatV, sigma_q=singular_values_[n_components - 1]
         )
 
@@ -453,6 +457,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         self.n_components_ = n_components
         self.explained_variance_ratio_ = explained_variance_ratio_[:n_components]
         self.singular_values_ = singular_values_[:n_components]
+        self.rho_ = rho
 
         return hatU, hatS_mat, hatV
 

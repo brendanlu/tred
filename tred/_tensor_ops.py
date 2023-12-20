@@ -124,6 +124,8 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
         hatS[rho[i] :, i] = 0
         hatV[:, rho[i] :, i] = 0
 
+    return rho
+
 
 def _mode0_unfold(tens):
     """As defined here https://jeankossaifi.com/blog/unfolding.html, there seem to be
