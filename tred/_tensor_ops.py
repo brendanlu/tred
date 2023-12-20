@@ -11,16 +11,16 @@ def _facewise_product(A, B):
 
     Parameters
     ----------
-    A : ArrayLike of shape (a, b, d)
-        $a \times b \times d$ tensor representation
+        A : ArrayLike of shape (a, b, d)
+            $a \times b \times d$ tensor representation
 
-    B : ArrayLike of shape (b, c, d)
-        $b \times c \times d$ tensor representation
+        B : ArrayLike of shape (b, c, d)
+            $b \times c \times d$ tensor representation
 
     Returns
     -------
-    C : ndarray, shape: (a, c, d)
-        facewise tensor product
+        C : ndarray, shape: (a, c, d)
+            facewise tensor product
 
     """
     # return np.einsum('mpi,pli->mli', A, B)
@@ -36,23 +36,23 @@ def _m_product(A, B, M, Minv):
 
     Parameters
     ----------
-    A : ArrayLike of shape (a, b, d)
-        $a \times b \times d$ tensor representation
+        A : ArrayLike of shape (a, b, d)
+            $a \times b \times d$ tensor representation
 
-    B : ArrayLike of shape (b, c, d)
-        $b \times c \times d$ tensor representation
+        B : ArrayLike of shape (b, c, d)
+            $b \times c \times d$ tensor representation
 
-    M : Callable[[ArrayLike], ndarray]
-        A function which, given some order-3 tensor, returns it under some $\times_3$
-        invertible transformation.
+        M : Callable[[ArrayLike], ndarray]
+            A function which, given some order-3 tensor, returns it under some $\times_3$
+            invertible transformation.
 
-    MInv : Callable[[ArrayLike], ndarray]
-        The inverse transformation of M
+        MInv : Callable[[ArrayLike], ndarray]
+            The inverse transformation of M
 
     Returns
     -------
-    m_product : ndarray, shape: (a, c, d)
-        Tensor-tensor m-product as found in Kilmer et al. (2021)
+        m_product : ndarray, shape: (a, c, d)
+            Tensor-tensor m-product as found in Kilmer et al. (2021)
     """
     assert (
         A.shape[1] == B.shape[0] and A.shape[2] == B.shape[2]
@@ -61,13 +61,39 @@ def _m_product(A, B, M, Minv):
     return Minv(_facewise_product(M(A), M(B)))
 
 
-def _rank_q_truncation_zero_out(hatU, hatS, hatV, q):
-    """Explicit rank-q truncation as in Mor et al. (2022)
+def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
+    """Explicit rank-q truncation as in Mor et al. (2022). Truncate, via zeroing out, the
+    input arrays passed in by reference.
 
-    NOTE: NOT USED so far in this package. We do not need to truncate the tSVDM matrices,
-    because it is more efficient to just simply select the top components that we need.
-    + [UNTESTED]
+    This will typically be called in the m-transformed ('hat') space.
+
+    Parameters
+    ----------
+        hatU : ArrayLike of shape (n, k, t)
+            tensor U returned by tSVDM
+
+        hatS : ArrayLike of shape (k, k, t) or (k, t)
+            singular values tensor, or matrix representation, from tSVDM
+
+        hatV : ArrayLike of shape (p, k, t)
+            tensor V returned by tSVDM
+
+        q : int
+            Explicit rank ``q``, of the truncation
+
+        sigma_q : float
+            If ``sigma_q`` is set, then the ``q`` input parameter will be ignored. Saves
+            computation time by passing in the q-th largest singular value, which
+            may be cheap from the calling state if a sorted array of singular values has
+            already been computed.
+
+    Returns
+    -------
+        None
+            Modifies inputs in-place
     """
+    assert not (q is None and sigma_q is None), "Please specify either q or sigma_q"
+
     # assume hatS in matrix form
     if len(hatS.shape) == 3:
         hatS = _singular_vals_tensor_to_mat(hatS)
@@ -75,7 +101,8 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, q):
     k, t = hatS.shape
 
     # determine the q-th largest singular value
-    sigma_q = np.partition(hatS.flatten(), -q)[-q]
+    if not sigma_q:
+        sigma_q = np.partition(hatS.flatten(), -q)[-q]
 
     # compute a representation of rho, as notated in Mor et al. (2022)
     # each diagonal of the frontal slice is already sorted in decreasing order
@@ -96,8 +123,6 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, q):
         hatU[:, rho[i] :, i] = 0
         hatS[rho[i] :, i] = 0
         hatV[:, rho[i] :, i] = 0
-
-    return hatU, hatS, hatV
 
 
 def _mode0_unfold(tens):

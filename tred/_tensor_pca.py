@@ -16,7 +16,7 @@ from sklearn.base import (
 )
 from sklearn.utils.validation import check_is_fitted
 
-from ._tensor_ops import _facewise_product
+from ._tensor_ops import _facewise_product, _rank_q_truncation_zero_out
 from ._utils import RealNotInt, _singular_vals_mat_to_tensor
 from ._m_transforms import generate_DCTii_M_transform_pair
 
@@ -99,7 +99,8 @@ def tsvdm(
     -------
         U_tens : ndarray, shape: (n, n, t) if full_frontal_slices==True else (n, k, t)
 
-        S_tens : ndarray, shape: (n, p, t) if svals_matrix_form==False else (k, t)
+        S_tens : ndarray, shape: (n, p, t) if full_frontal_slices==True else (k, k, t)
+            if svals_matrix_form==False, S_mat of shape (k, t) returned instead
 
         V_tens : ndarray, shape: (p, p, t) if full_frontal_slices==True else (p, k, t)
     """
@@ -196,7 +197,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         The dimensions of the training data. ``k_ == min(n_, p_)``
 
     n_components_ : int
-        The estimated number of components. If `n_components` was explicitly set by an
+        The estimated number of components. If ``n_components`` was explicitly set by an
         integer value, this will be the same as that. If `n_components` was a number
         between 0 and 1, this number is estimated from input data. Otherwise, if not set
         (defaults to None), it will default to $k \times t$ in the training data.
@@ -441,6 +442,11 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
             self._k_t_flatten_sort[:n_components], shape=hatS_mat.shape, order="F"
         )
 
+        # perform truncation. this speeds up subsequent calls to transform
+        _rank_q_truncation_zero_out(
+            hatU, hatS_mat, hatV, sigma_q=singular_values_[n_components - 1]
+        )
+
         # store public attributes; as per sklearn conventions, we use trailing underscores
         # to indicate that they have been populated following a call to fit()
         self.n_, self.p_, self.t_, self.k_ = n, p, t, k
@@ -454,7 +460,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
     def _n_features_out(self):
         """Number of transformed output features.
 
-        [CAN IGNORE]: This is an sklearn implementation detail, and does not affect any 
+        [CAN IGNORE]: This is an sklearn implementation detail, and does not affect any
         of the statistical functionality in this class.
         See sklearn/decompositions/_base.py
         """
