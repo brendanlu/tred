@@ -454,8 +454,8 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
     def _n_features_out(self):
         """Number of transformed output features.
 
-        This is an sklearn implementation
-        detail, and does not affect any of the underlying implementation in this class.
+        [CAN IGNORE]: This is an sklearn implementation detail, and does not affect any 
+        of the statistical functionality in this class.
         See sklearn/decompositions/_base.py
         """
         return self.n_components_

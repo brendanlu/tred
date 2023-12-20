@@ -6,10 +6,9 @@ import numpy as np
 
 
 class RealNotInt(Real):
-    """FOR INTERNAL PARAMETER VALIDATION
-
-    A type that represents non-integer real numbers.
-
+    """A type that represents non-integer real numbers.
+    
+    [CAN IGNORE]: For internal parameter validation, inspired by sklearn practices. 
     [COPIED] From sklearn/utils/_param_validation.py
 
     Behaves like float, but also works with values extracted from numpy arrays.
