@@ -9,7 +9,11 @@ interested in.
 
 from numbers import Integral
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import (
+    BaseEstimator,
+    ClassNamePrefixFeaturesOutMixin,
+    TransformerMixin,
+)
 from sklearn.utils.validation import check_is_fitted
 
 from ._tensor_ops import _facewise_product
@@ -146,7 +150,7 @@ def tsvdm(
         )
 
 
-class TPCA(BaseEstimator, TransformerMixin):
+class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
     """t-SVDM tensor analogue of PCA using explicit rank truncation with explicit rank
     truncation from Mor et al. (2022), and underlying m-product framework from Kilmer et
     al. (2021). Takes in an $n \times p \times t$ input tensor, and transforms into
@@ -181,6 +185,11 @@ class TPCA(BaseEstimator, TransformerMixin):
     MInv : Callable[[ArrayLike], ndarray] or None, default=None
         The inverse transformation of M.
 
+    centre : bool, default=True
+        If False, the data tensor will not be centralized into Mean Deviation Form.
+        By default, the mean horizontal slice of the tensor is subtracted, so that all of
+        the horizontal slices sum to 0, analagous to centering the data in PCA.
+
     Attributes
     ----------
     n_, p_, t_, k_ : int
@@ -204,7 +213,8 @@ class TPCA(BaseEstimator, TransformerMixin):
 
     mean_ : ndarray of shape(p_, t_)
         Per-feature, per-timepoint empirical mean, estimated from the training set.
-        This is used to normalize any new data passed to transform(X).
+        This is used to normalize any new data passed to transform(X), unless centre
+        is explicitly turned off via ``centre==False`` during object instantiation.
 
     References
     ----------
@@ -222,13 +232,14 @@ class TPCA(BaseEstimator, TransformerMixin):
     See also: https://github.com/UriaMorP/mprod_package
     """
 
-    def __init__(self, n_components=None, copy=True, *, M=None, Minv=None):
+    def __init__(self, n_components=None, *, copy=True, M=None, Minv=None, centre=True):
         # as per sklearn conventions, we perform any and all parameter validation inside
         # fit, and none in __init__
         self.n_components = n_components
         self.copy = copy
         self.M = M
         self.Minv = Minv
+        self.centre = centre
 
     def fit(self, X, y=None):
         """Fit the model with X.
@@ -276,10 +287,13 @@ class TPCA(BaseEstimator, TransformerMixin):
             X.shape[1] == self.p_ and X.shape[2] == self.t_
         ), "Ensure the number of features, and time points, matches the model fit data"
 
+        if self.centre:
+            X = X - self.mean_
+
         # in the interest of efficiency, V was returned in the m-transformed space from
         # tsvdm saving a pair of roundabout calls to M and Minv, and pick out the top
         # i_q and j_q indexes, as notated in Mor et al. (2022)
-        return _facewise_product(self.M(X - self.mean_), self._hatV)[
+        return _facewise_product(self.M(X), self._hatV)[
             :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
         ]
 
@@ -348,7 +362,8 @@ class TPCA(BaseEstimator, TransformerMixin):
         self.mean_ = np.mean(X, axis=0)
         if self.copy:
             X = X.copy()
-        X -= self.mean_
+        if self.center:
+            X -= self.mean_
 
         # if there is no explicitly defined transform in __init__, assign functions to
         # perform a default transformation
