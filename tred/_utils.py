@@ -1,5 +1,6 @@
 """Miscallaneous utilities"""
 
+
 from numbers import Real
 import numpy as np
 
