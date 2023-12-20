@@ -7,7 +7,7 @@ from ._utils import _singular_vals_tensor_to_mat
 
 
 def _facewise_product(A, B):
-    """Facewise product s.t. $C_{:,:,i} = A_{:,:,i} B{:,:,i}$
+    """Facewise product s.t. $C_{:,:,i} = A_{:,:,i} B_{:,:,i}$
 
     Parameters
     ----------
