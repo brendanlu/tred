@@ -1,13 +1,15 @@
 tred
 ----
 tred implements a range of order-3 tensor decompositions. Mathematically, 
-they rely on a novel tensor algebra introduced in [1]. In this, analogues of 
-SVD, PCA, and PLS can be formulated, sharing many optimality properties with 
-their matrix counterparts. 
+they rely on a novel tensor algebra introduced in [1]. Within this framework, 
+natural tensor analogues of SVD and PCA were recently formulated; these 
+decomposition techniques also have analytically proven optimality properties 
+that mirror those of their matrix counterparts. 
 
-The only top-level dependency, for an end user, is scikit-learn. We adopt many
-of their utilities and design patterns so tred is very natural to anyone with 
-experience with the scipy/scikit-learn stack. 
+The only top-level dependency, for an end user, is scikit-learn. We inherit from 
+their base classes, so tred's class API's should be natural to any past 
+scikit-learn users. tred's function API's also mirror scipy counterparts as much
+as possible. 
 
 For the underlying tensor-product framework and tensor t-SVDM, see [1]. 
 For the explicit rank truncation, and the TCAM algorithm, see [2]. 
@@ -34,8 +36,10 @@ For developer dependencies
 
 Please kindly run 
     black . 
-
 In the root to autoformat code when opening pull requests to this repo.  
+
+Much of the implementation and code practice mirrors that of scikit-learn. We
+adopt their utilities and general coding guidelines whenever we can. 
 
 Credit
 ------
@@ -46,11 +50,8 @@ And also by
 
 Future
 ------
-We have placed a heavy emphasis on mathematical interpretability of the 
-source code and computational efficiency (within the constraints of our 
-dependencies) to fit within highly iterative machine-learning and statistical 
-analysis workflows. 
+New experimental methods may be added to tred. 
 
-New experimental methods may also be added to tred. Users are highly encouraged 
-to visit the GitHub site, and open issues. We are very interested in optimizing 
-the efficiency of the existing implementations if the need arises. 
+Users are highly encouraged to visit the GitHub site, and open issues. We are 
+very interested in optimizing the efficiency of the existing implementations, or 
+providing support for more general Python array frameworks - if needs arise. 
