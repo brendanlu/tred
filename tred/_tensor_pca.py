@@ -219,7 +219,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
     
     rho_ : ndarray of shape (t,)
         The rho used in multi-rank truncation to achieve the desired explicit rank of 
-        ``n_components``. See Kilmer et al. (2021) tSVDMii and Mor et al. (2022)
+        ``n_components``. See Mor et al. (2022) for detail. 
 
     References
     ----------
@@ -446,7 +446,9 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
             self._k_t_flatten_sort[:n_components], shape=hatS_mat.shape, order="F"
         )
 
-        # perform truncation. this speeds up subsequent calls to transform
+        # perform truncation. this speeds up subsequent calls to transform, but is not
+        # required to obtain the correct results. we include it because it also 
+        # computes rho, at basically no extra cost
         rho = _rank_q_truncation_zero_out(
             hatU, hatS_mat, hatV, sigma_q=singular_values_[n_components - 1]
         )
