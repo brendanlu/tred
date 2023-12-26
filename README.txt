@@ -31,15 +31,22 @@ means k = n, as p >> n typically.
 
 Development
 -----------
-For developer dependencies
+For anyone who is interested in adding to the package.
+
+For development dependencies
     pip install -r requirements.txt
+
+To test any changes, invoke
+    pytest . 
+In the root to run the tests in the test folder.
 
 Please kindly run 
     black . 
 In the root to autoformat code when opening pull requests to this repo.  
 
 Much of the implementation and code practice mirrors that of scikit-learn. We
-adopt their utilities and general coding guidelines whenever we can. 
+adopt their utilities and general coding guidelines whenever we can. Be very
+liberal in adding tests, both for new and existing features!
 
 Credit
 ------

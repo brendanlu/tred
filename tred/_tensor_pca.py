@@ -216,10 +216,10 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         Per-feature, per-timepoint empirical mean, estimated from the training set.
         This is used to normalize any new data passed to transform(X), unless centre
         is explicitly turned off via ``centre==False`` during object instantiation.
-    
+
     rho_ : ndarray of shape (t,)
-        The rho used in multi-rank truncation to achieve the desired explicit rank of 
-        ``n_components``. See Mor et al. (2022) for detail. 
+        The rho used in multi-rank truncation to achieve the desired explicit rank of
+        ``n_components``. See Mor et al. (2022) for detail.
 
     References
     ----------
@@ -342,7 +342,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         """
         # note that these tensors do NOT have full face-wise matrices
         hatU, hatS_mat, _ = self._fit(X)
-        hatS = _singular_vals_mat_to_tensor(hatS_mat, self.n_, self.k_, self.t_)
+        hatS = _singular_vals_mat_to_tensor(hatS_mat, self.k_, self.k_, self.t_)
         return _facewise_product(hatU, hatS)[
             :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
         ]
@@ -447,7 +447,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         )
 
         # perform truncation. this speeds up subsequent calls to transform, but is not
-        # required to obtain the correct results. we include it because it also 
+        # required to obtain the correct results. we include it because it also
         # computes rho, at basically no extra cost
         rho = _rank_q_truncation_zero_out(
             hatU, hatS_mat, hatV, sigma_q=singular_values_[n_components - 1]
