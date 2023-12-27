@@ -8,11 +8,11 @@ from numpy.testing import assert_allclose
 from tred import TPCA
 
 
-# The following has been copied over from sklearn's testing practices for sparse 
+# The following has been copied over from sklearn's testing practices for sparse
 # containers, with a minor modification
 # NOTE: We currently do not have sparse tests in this module...
-# TODO: Extend tpca for sparse inputs, using the 'ARPACK' svd solver from 
-# scipy.sparse.linalg.svds 
+# TODO: Extend tpca for sparse inputs, using the 'ARPACK' svd solver from
+# scipy.sparse.linalg.svds
 # ----------------------------------------------------------------------------------------
 # TODO: We can consider removing the containers and importing
 # directly from SciPy when sparse matrices will be deprecated.
@@ -53,8 +53,7 @@ SPARSE_N, SPARSE_P, SPARSE_T = 300, 1000, 20  # arbitrary
 
 
 def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
-    """Check all of the fitted attributes of the two tpca class instances are the 'same'
-    """
+    """Check all of the fitted attributes of the two tpca class instances are the 'same'"""
     assert_allclose(tpca1.n_, tpca2.n_, rtol=rtol, atol=atol)
     assert_allclose(tpca1.p_, tpca2.p_, rtol=rtol, atol=atol)
     assert_allclose(tpca1.t_, tpca2.t_, rtol=rtol, atol=atol)
@@ -64,7 +63,7 @@ def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
         tpca1.explained_variance_ratio_,
         tpca2.explained_variance_ratio_,
         rtol=rtol,
-        atol=atol, 
+        atol=atol,
     )
     assert_allclose(
         tpca1.singular_values_, tpca2.singular_values_, rtol=rtol, atol=atol
@@ -93,15 +92,14 @@ def test_tpca(tensor_size, element_scale, include_negatives, n_components):
 
     X_r = tpca.fit(X).transform(X)
 
-
     # check the output is intended size
     assert len(X_r.shape) == 2
     assert X_r.shape[0] == n
     if n_components is None:
         assert X_r.shape[1] == k * t
     elif isinstance(n_components, int):
-        assert X_r.shape[1] == n_components 
-        
+        assert X_r.shape[1] == n_components
+
     # check the equivalence of fit.transform and fit_transform
     # allow 1e-10 of absolute tolerance for small elements
     X_r2 = tpca.fit_transform(X)
@@ -110,10 +108,10 @@ def test_tpca(tensor_size, element_scale, include_negatives, n_components):
     # test rho
     if n_components is None:
         assert tpca.rho_.sum() == k * t
-    elif isinstance(n_components, int): 
+    elif isinstance(n_components, int):
         assert tpca.rho_.sum() == n_components
     else:
-        # just check the sum of rho against internal n_components_ 
+        # just check the sum of rho against internal n_components_
         assert tpca.rho_.sum() == tpca.n_components_
 
     # test explained variance ratio
