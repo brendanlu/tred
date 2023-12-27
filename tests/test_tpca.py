@@ -10,6 +10,9 @@ from tred import TPCA
 
 # The following has been copied over from sklearn's testing practices for sparse 
 # containers, with a minor modification
+# NOTE: We currently do not have sparse tests in this module...
+# TODO: Extend tpca for sparse inputs, using the 'ARPACK' svd solver from 
+# scipy.sparse.linalg.svds 
 # ----------------------------------------------------------------------------------------
 # TODO: We can consider removing the containers and importing
 # directly from SciPy when sparse matrices will be deprecated.
@@ -39,7 +42,7 @@ GLOBAL_SEED = 1
 
 # various n, p, t sizes
 # ensure n > p, p > n inputs are tested
-TENSOR_SIZES = [(100, 30, 20), (20, 1000, 5)]
+TENSOR_SIZES = [(100, 30, 20), (20, 500, 5), (2, 2, 15)]
 
 # test tiny, small, medium, and large numbers
 ELEMENT_SCALES = [10**i for i in range(-2, 4)]
@@ -73,12 +76,13 @@ def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
 @pytest.mark.parametrize("tensor_size", TENSOR_SIZES)
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
-def test_full_tpca(tensor_size, element_scale, include_negatives):
+@pytest.mark.parametrize("n_components", [None, 1, 2, 10])
+def test_tpca(tensor_size, element_scale, include_negatives, n_components):
     rng = np.random.default_rng(seed=GLOBAL_SEED)
 
     n, p, t = tensor_size
     k = min(n, p)
-    tpca = TPCA(n_components=None)
+    tpca = TPCA(n_components=n_components)
 
     # tensors of various sizes with uniformly distributed elements
     # within [0, tensor_size) or [-0.5*tensor_size, 0.5*tensor_size)
@@ -89,10 +93,14 @@ def test_full_tpca(tensor_size, element_scale, include_negatives):
 
     X_r = tpca.fit(X).transform(X)
 
+
     # check the output is intended size
     assert len(X_r.shape) == 2
     assert X_r.shape[0] == n
-    assert X_r.shape[1] == k * t
+    if not n_components is None:
+        assert X_r.shape[1] == n_components 
+    else:
+        assert X_r.shape[1] == k * t
 
     # check the equivalence of fit.transform and fit_transform
     # allow 1e-10 of absolute tolerance for small elements
@@ -100,22 +108,11 @@ def test_full_tpca(tensor_size, element_scale, include_negatives):
     assert_allclose(X_r, X_r2, rtol=1e-7, atol=1e-10)
 
     # test rho
-    assert tpca.rho_.sum() == k * t
+    if not n_components is None:
+        assert tpca.rho_.sum() == n_components
+    else: 
+        assert tpca.rho_.sum() == k * t
 
     # test explained variance ratio
-    assert_allclose(tpca.explained_variance_ratio_.sum(), 1.0)
-
-"""
-@pytest.mark.parametrize("density", [0.01, 0.1, 0.30])
-@pytest.mark.parametrize("n_components", [1, 2, 10])
-def test_tpca_sparse(density):
-    rng = np.random.default_rng(seed=GLOBAL_SEED)
-    pass
-
-
-""" 
-"""
-def test_tpca_truncation(tensor_size):
-    pass
-
-"""
+    if n_components is None:
+        assert_allclose(tpca.explained_variance_ratio_.sum(), 1.0)
