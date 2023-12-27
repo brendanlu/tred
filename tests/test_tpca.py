@@ -76,7 +76,7 @@ def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
 @pytest.mark.parametrize("tensor_size", TENSOR_SIZES)
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
-@pytest.mark.parametrize("n_components", [None, 1, 2, 10])
+@pytest.mark.parametrize("n_components", [None, 1, 2, 10, 0.3, 0.8])
 def test_tpca(tensor_size, element_scale, include_negatives, n_components):
     rng = np.random.default_rng(seed=GLOBAL_SEED)
 
@@ -97,22 +97,29 @@ def test_tpca(tensor_size, element_scale, include_negatives, n_components):
     # check the output is intended size
     assert len(X_r.shape) == 2
     assert X_r.shape[0] == n
-    if not n_components is None:
-        assert X_r.shape[1] == n_components 
-    else:
+    if n_components is None:
         assert X_r.shape[1] == k * t
-
+    elif isinstance(n_components, int):
+        assert X_r.shape[1] == n_components 
+        
     # check the equivalence of fit.transform and fit_transform
     # allow 1e-10 of absolute tolerance for small elements
     X_r2 = tpca.fit_transform(X)
     assert_allclose(X_r, X_r2, rtol=1e-7, atol=1e-10)
 
     # test rho
-    if not n_components is None:
-        assert tpca.rho_.sum() == n_components
-    else: 
+    if n_components is None:
         assert tpca.rho_.sum() == k * t
+    elif isinstance(n_components, int): 
+        assert tpca.rho_.sum() == n_components
+    else:
+        # just check the sum of rho against internal n_components_ 
+        assert tpca.rho_.sum() == tpca.n_components_
 
     # test explained variance ratio
     if n_components is None:
         assert_allclose(tpca.explained_variance_ratio_.sum(), 1.0)
+    elif isinstance(n_components, float):
+        # if n_components specifies the minimum amount of explained variance, check that
+        # the truncation achieves this
+        assert tpca.explained_variance_ratio_.sum() > n_components
