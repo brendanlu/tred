@@ -101,7 +101,7 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
     k, t = hatS.shape
 
     # determine the q-th largest singular value
-    if not sigma_q:
+    if sigma_q is None:
         sigma_q = np.partition(hatS.flatten(), -q)[-q]
 
     # compute a representation of rho, as notated in Mor et al. (2022)
