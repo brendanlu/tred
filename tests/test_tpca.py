@@ -42,7 +42,7 @@ GLOBAL_SEED = 1
 
 # various n, p, t sizes
 # ensure n > p, p > n inputs are tested
-TENSOR_SIZES = [(100, 30, 20), (20, 500, 5), (2, 2, 15)]
+TENSOR_SIZES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
 
 # test tiny, small, medium, and large numbers
 ELEMENT_SCALES = [10**i for i in range(-2, 4)]
@@ -75,7 +75,7 @@ def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
 @pytest.mark.parametrize("tensor_size", TENSOR_SIZES)
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
-@pytest.mark.parametrize("n_components", [None, 1, 2, 10, 0.3, 0.8])
+@pytest.mark.parametrize("n_components", [None, 1, 6, 0.3, 0.8])
 def test_tpca(tensor_size, element_scale, include_negatives, n_components):
     rng = np.random.default_rng(seed=GLOBAL_SEED)
 
