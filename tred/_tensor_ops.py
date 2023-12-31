@@ -119,6 +119,7 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
 
     # perform multi-rank truncation, t should be modestly sized, so the for-loop
     # should be bearable
+    # NOTE: there is probably some Numpy trick for this
     for i in range(t):
         hatU[:, rho[i] :, i] = 0
         hatS[rho[i] :, i] = 0
