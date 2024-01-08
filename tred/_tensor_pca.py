@@ -302,7 +302,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         # in the interest of efficiency, V was returned in the m-transformed space from
         # tsvdm saving a pair of roundabout calls to M and Minv, and pick out the top
         # i_q and j_q indexes, as notated in Mor et al. (2022)
-        return _facewise_product(self.M(X), self._hatV)[
+        return _facewise_product(self.M_(X), self._hatV)[
             :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
         ]
 
