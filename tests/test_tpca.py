@@ -5,7 +5,7 @@ import pytest
 import scipy
 from numpy.testing import assert_allclose
 
-from tred import TPCA
+from tred import TPCA, tsvdm
 
 
 # The following has been copied over from sklearn's testing practices for sparse
@@ -53,7 +53,7 @@ SPARSE_N, SPARSE_P, SPARSE_T = 300, 1000, 20  # arbitrary
 
 
 def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
-    """Check all of the fitted attributes of the two tpca class instances are the 'same'"""
+    """Check all of the fitted attributes of the two tpca classes"""
     assert_allclose(tpca1.n_, tpca2.n_, rtol=rtol, atol=atol)
     assert_allclose(tpca1.p_, tpca2.p_, rtol=rtol, atol=atol)
     assert_allclose(tpca1.t_, tpca2.t_, rtol=rtol, atol=atol)
@@ -77,6 +77,7 @@ def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
 @pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("n_components", [None, 1, 6, 0.3, 0.8])
 def test_tpca(tensor_size, element_scale, include_negatives, n_components):
+    """Make sure different inputs work, and perform basic sense checks"""
     rng = np.random.default_rng(seed=GLOBAL_SEED)
 
     n, p, t = tensor_size

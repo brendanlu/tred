@@ -196,6 +196,10 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
     n_, p_, t_, k_ : int
         The dimensions of the training data. ``k_ == min(n_, p_)``
 
+    M_, MInv_ : Callable[[ArrayLike], ndarray]
+        The m-transform pair (forward and inverse) used for the underlying tensor-tensor
+        m-product.
+
     n_components_ : int
         The estimated number of components. If ``n_components`` was explicitly set by an
         integer value, this will be the same as that. If `n_components` was a number
@@ -373,13 +377,13 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         # if there is no explicitly defined transform in __init__, assign functions to
         # perform a default transformation
         if self.M is None:  # and Minv is None - guaranteed by assertion
-            self.M, self.Minv = _generate_default_m_transform_pair(X.shape[2])
+            self.M_, self.Minv_ = _generate_default_m_transform_pair(X.shape[2])
 
         # perform tensor decomposition via Kilmer's tSVDM
         hatU, hatS_mat, hatV = tsvdm(
             X,
-            self.M,
-            self.Minv,
+            self.M_,
+            self.Minv_,
             keep_hats=True,
             full_frontal_slices=False,
             svals_matrix_form=True,
