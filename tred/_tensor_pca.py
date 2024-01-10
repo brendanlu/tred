@@ -16,7 +16,7 @@ from sklearn.base import (
 )
 from sklearn.utils.validation import check_is_fitted
 
-from ._tensor_ops import _facewise_product, _rank_q_truncation_zero_out
+from ._tensor_ops import facewise_product, _rank_q_truncation_zero_out
 from ._utils import RealNotInt, _singular_vals_mat_to_tensor
 from ._m_transforms import generate_DCTii_M_transform_pair
 
@@ -302,7 +302,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         # in the interest of efficiency, V was returned in the m-transformed space from
         # tsvdm saving a pair of roundabout calls to M and Minv, and pick out the top
         # i_q and j_q indexes, as notated in Mor et al. (2022)
-        return _facewise_product(self.M_(X), self._hatV)[
+        return facewise_product(self.M_(X), self._hatV)[
             :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
         ]
 
@@ -347,7 +347,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         # note that these tensors do NOT have full face-wise matrices
         hatU, hatS_mat, _ = self._fit(X)
         hatS = _singular_vals_mat_to_tensor(hatS_mat, self.k_, self.k_, self.t_)
-        return _facewise_product(hatU, hatS)[
+        return facewise_product(hatU, hatS)[
             :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
         ]
 

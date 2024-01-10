@@ -26,6 +26,11 @@ def display_tensor_facewise(tens):
     print output is a more intuitive sequence of frontal slices. We often use this in
     notebooks.
 
+    Parameters
+    ----------
+    tens : ArrayLike of shape (n, p, t)
+        Order-3 tensor representation
+
     Examples
     --------
     >>> import numpy as np

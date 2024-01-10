@@ -6,7 +6,7 @@ import numpy as np
 from ._utils import _singular_vals_tensor_to_mat
 
 
-def _facewise_product(A, B):
+def facewise_product(A, B):
     """Facewise product s.t. $C_{:,:,i} = A_{:,:,i} B_{:,:,i}$
 
     Parameters
@@ -28,11 +28,11 @@ def _facewise_product(A, B):
     return np.matmul(A.transpose(2, 0, 1), B.transpose(2, 0, 1)).transpose(1, 2, 0)
 
 
-def _m_product(A, B, M, Minv):
+def m_product(A, B, M, Minv):
     """Kilmer et al. (2021) tensor m-product for order-3 tensors. See [1]
 
     NOTE: NOT USED so far in this package. We tend to keep variables in the transformed
-    space, and therefore directly use the _facewise_product function.
+    space, and therefore directly use the facewise_product function.
 
     Parameters
     ----------
@@ -58,7 +58,7 @@ def _m_product(A, B, M, Minv):
         A.shape[1] == B.shape[0] and A.shape[2] == B.shape[2]
     ), "Non conforming dimensions"
 
-    return Minv(_facewise_product(M(A), M(B)))
+    return Minv(facewise_product(M(A), M(B)))
 
 
 def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
