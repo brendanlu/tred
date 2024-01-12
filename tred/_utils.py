@@ -28,8 +28,8 @@ def display_tensor_facewise(tens):
 
     Parameters
     ----------
-    tens : ArrayLike of shape (n, p, t)
-        Order-3 tensor representation
+        tens : ArrayLike of shape (n, p, t)
+            Order-3 tensor representation
 
     Examples
     --------
@@ -40,11 +40,9 @@ def display_tensor_facewise(tens):
     [[[1.]
     [0.]
     [0.]]
-
     [[0.]
     [1.]
     [0.]]
-
     [[0.]
     [0.]
     [1.]]]

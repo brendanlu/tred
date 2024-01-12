@@ -162,3 +162,7 @@ cython_debug/
 
 # test notebook
 test.ipynb
+
+# docs
+docs/
+html/
