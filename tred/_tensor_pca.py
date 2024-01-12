@@ -225,6 +225,10 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         The rho used in multi-rank truncation to achieve the desired explicit rank of
         ``n_components``. See Mor et al. (2022) for detail.
 
+    loadings_matrix_ : ndarray of shape (n_components_, p_)
+        The i-th row corresponds to the column of $\hat{V}$ which contains the feature 
+        weights applied to the data (in the hat-space) to get the i-th TPCA component. 
+
     References
     ----------
     For the underlying m-product algebra in which the tensor analogue of SVD, and
@@ -437,10 +441,6 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
                 f"Got {type(self.n_components)} instead"
             )
 
-        # we store the features tensor, in the tSVDM decomposition, in the transforemd
-        # space, saving roundabout calls to M and Minv when performing m-product with new
-        # data
-        self._hatV = hatV
         # now convert the argsort indexes back into the two dimensional indexes. in the
         # same tensor semantics as hatS_mat, the rows (tuple[0]) in this multindex
         # correspond to the p-dimension location, and the columns (tuple[1]) in the
@@ -457,6 +457,11 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
             hatU, hatS_mat, hatV, sigma_q=singular_values_[n_components - 1]
         )
 
+        # we store the features tensor, in the tSVDM decomposition, in the transforemd
+        # space, saving roundabout calls to M and Minv when performing m-product with new
+        # data
+        self._hatV = hatV
+
         # store public attributes; as per sklearn conventions, we use trailing underscores
         # to indicate that they have been populated following a call to fit()
         self.n_, self.p_, self.t_, self.k_ = n, p, t, k
@@ -464,6 +469,9 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         self.explained_variance_ratio_ = explained_variance_ratio_[:n_components]
         self.singular_values_ = singular_values_[:n_components]
         self.rho_ = rho
+        self.loadings_matrix_ = hatV[
+            :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
+        ]
 
         return hatU, hatS_mat, hatV
 
