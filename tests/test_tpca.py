@@ -81,13 +81,18 @@ def test_tsvdm(tensor_size, element_scale, include_negatives, transform_generato
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("n_components", [None, 1, 6, 0.3, 0.8])
-def test_tpca(tensor_size, element_scale, include_negatives, n_components):
+@pytest.mark.parametrize("transform_generator", TRANSFORM_FAMILY_GENERATORS)
+def test_tpca(
+    tensor_size, element_scale, include_negatives, n_components, transform_generator
+):
     """Make sure different inputs work, and perform basic sense checks"""
     rng = np.random.default_rng(seed=GLOBAL_SEED)
 
     n, p, t = tensor_size
     k = min(n, p)
-    tpca = TPCA(n_components=n_components)
+
+    M, Minv = transform_generator(t)
+    tpca = TPCA(n_components=n_components, M=M, Minv=Minv)
 
     # tensors of various sizes with uniformly distributed elements
     # within [0, tensor_size) or [-0.5*tensor_size, 0.5*tensor_size)
