@@ -7,37 +7,6 @@ from numpy.testing import assert_allclose
 
 from tred import TPCA, tsvdm
 
-
-# The following has been copied over from sklearn's testing practices for sparse
-# containers, with a minor modification
-# NOTE: We currently do not have sparse tests in this module...
-# TODO: Extend tpca for sparse inputs, using the 'ARPACK' svd solver from
-# scipy.sparse.linalg.svds
-# ----------------------------------------------------------------------------------------
-# TODO: We can consider removing the containers and importing
-# directly from SciPy when sparse matrices will be deprecated.
-CSR_CONTAINERS = [scipy.sparse.csr_matrix]
-CSC_CONTAINERS = [scipy.sparse.csc_matrix]
-COO_CONTAINERS = [scipy.sparse.coo_matrix]
-LIL_CONTAINERS = [scipy.sparse.lil_matrix]
-DOK_CONTAINERS = [scipy.sparse.dok_matrix]
-BSR_CONTAINERS = [scipy.sparse.bsr_matrix]
-DIA_CONTAINERS = [scipy.sparse.dia_matrix]
-
-if parse_version(scipy.__version__) >= parse_version("1.8"):
-    # Sparse Arrays have been added in SciPy 1.8
-    # TODO: When SciPy 1.8 is the minimum supported version,
-    # those list can be created directly without this condition.
-    # See: https://github.com/scikit-learn/scikit-learn/issues/27090
-    CSR_CONTAINERS.append(scipy.sparse.csr_array)
-    CSC_CONTAINERS.append(scipy.sparse.csc_array)
-    COO_CONTAINERS.append(scipy.sparse.coo_array)
-    LIL_CONTAINERS.append(scipy.sparse.lil_array)
-    DOK_CONTAINERS.append(scipy.sparse.dok_array)
-    BSR_CONTAINERS.append(scipy.sparse.bsr_array)
-    DIA_CONTAINERS.append(scipy.sparse.dia_array)
-# ----------------------------------------------------------------------------------------
-
 GLOBAL_SEED = 1
 
 # various n, p, t sizes
@@ -47,13 +16,11 @@ TENSOR_SIZES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
 # test tiny, small, medium, and large numbers
 ELEMENT_SCALES = [10**i for i in range(-2, 4)]
 
-# sparse size input
-# a dense array of this same size is also allocated for comparison
-SPARSE_N, SPARSE_P, SPARSE_T = 300, 1000, 20  # arbitrary
-
 
 def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
-    """Check all of the fitted attributes of the two tpca classes"""
+    """Check all of the fitted attributes of the two tpca classes
+    NOTE: unused at the moment, but will likely be useful in future tests
+    """
     assert_allclose(tpca1.n_, tpca2.n_, rtol=rtol, atol=atol)
     assert_allclose(tpca1.p_, tpca2.p_, rtol=rtol, atol=atol)
     assert_allclose(tpca1.t_, tpca2.t_, rtol=rtol, atol=atol)

@@ -21,7 +21,6 @@ def facewise_product(A, B):
     -------
         C : ndarray, shape: (a, c, d)
             facewise tensor product
-
     """
     # return np.einsum('mpi,pli->mli', A, B)
     # the following is a quicker version of the above using numpy broadcasting

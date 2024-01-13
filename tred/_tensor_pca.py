@@ -226,8 +226,8 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         ``n_components``. See Mor et al. (2022) for detail.
 
     loadings_matrix_ : ndarray of shape (n_components_, p_)
-        The i-th row corresponds to the column of $\hat{V}$ which contains the feature 
-        weights applied to the data (in the hat-space) to get the i-th TPCA component. 
+        The i-th row corresponds to the column of $\hat{V}$ which contains the feature
+        weights applied to the data (in the hat-space) to get the i-th TPCA component.
 
     References
     ----------
