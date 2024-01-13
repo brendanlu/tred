@@ -122,3 +122,6 @@ def test_tpca(tensor_size, element_scale, include_negatives, n_components):
         # if n_components specifies the minimum amount of explained variance, check that
         # the truncation achieves this
         assert tpca.explained_variance_ratio_.sum() > n_components
+
+    # test the shape of the loadings matrix
+    assert tpca.loadings_matrix_.shape == (tpca.n_components_, tpca.p_)

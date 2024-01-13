@@ -471,7 +471,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         self.rho_ = rho
         self.loadings_matrix_ = hatV[
             :, self._k_t_flatten_sort[0], self._k_t_flatten_sort[1]
-        ]
+        ].T
 
         return hatU, hatS_mat, hatV
 
