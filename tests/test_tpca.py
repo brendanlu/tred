@@ -2,16 +2,27 @@ from functools import reduce
 
 import numpy as np
 import pytest
-import scipy
 from numpy.testing import assert_allclose
 
-from tred import TPCA, tsvdm, m_product, generate_dctii_m_transform_pair
+from tred import (
+    TPCA,
+    tsvdm,
+    m_product,
+    generate_dctii_m_transform_pair,
+    generate_dstii_m_transform_pair,
+)
 
 GLOBAL_SEED = 1
 
 # various n, p, t sizes
 # ensure n > p, p > n inputs are tested
-TENSOR_SIZES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
+TENSOR_SHAPES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
+
+# m transforms to suit the tensor sizes above
+TRANSFORM_FAMILY_GENERATORS = [
+    generate_dctii_m_transform_pair,
+    generate_dstii_m_transform_pair,
+]
 
 # test tiny, small, medium, and large numbers
 ELEMENT_SCALES = [10**i for i in range(-2, 4)]
@@ -39,12 +50,12 @@ def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
     assert_allclose(tpca1.rho_, tpca2.rho_, rtol=rtol, atol=atol)
 
 
-@pytest.mark.parametrize("tensor_size", TENSOR_SIZES)
+@pytest.mark.parametrize("tensor_size", TENSOR_SHAPES)
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
-def test_tsvdm(tensor_size, element_scale, include_negatives):
+@pytest.mark.parametrize("transform_generator", TRANSFORM_FAMILY_GENERATORS)
+def test_tsvdm(tensor_size, element_scale, include_negatives, transform_generator):
     rng = np.random.default_rng(seed=GLOBAL_SEED)
-
     n, p, t = tensor_size
 
     # tensors of various sizes with uniformly distributed elements
@@ -54,7 +65,7 @@ def test_tsvdm(tensor_size, element_scale, include_negatives):
         - include_negatives * 0.5 * element_scale
     )
 
-    M, Minv = generate_dctii_m_transform_pair(t)
+    M, Minv = transform_generator(t)
     U, S, V = tsvdm(X, M=M, Minv=Minv)
     Vt = V.transpose(1, 0, 2)
 
@@ -66,7 +77,7 @@ def test_tsvdm(tensor_size, element_scale, include_negatives):
     assert_allclose(X, X_reconstruct)
 
 
-@pytest.mark.parametrize("tensor_size", TENSOR_SIZES)
+@pytest.mark.parametrize("tensor_size", TENSOR_SHAPES)
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("n_components", [None, 1, 6, 0.3, 0.8])

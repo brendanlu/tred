@@ -105,12 +105,13 @@ def tsvdm(
         V_tens : ndarray, shape: (p, p, t) if full_frontal_slices==True else (p, k, t)
     """
 
+    assert len(A.shape) == 3, "Ensure order-3 tensor input"
     assert not (
         callable(M) ^ callable(Minv)
     ), "If explicitly defined, both M and its inverse must be defined"
 
     if M is None:  # and Minv is None - guaranteed by assertion
-        M, Minv = _generate_default_m_transform_pair(A.shape[2])
+        M, Minv = _generate_default_m_transform_pair(A.shape[-1])
 
     # transform the tensor to new space via the mode-3 product
     hatA = M(A)
@@ -143,7 +144,7 @@ def tsvdm(
         return (
             Minv(hatU),
             # by default return S as n,p,t f-diagonal tensor, matching literature
-            # (optionally) convert into compressed matrix of singular values of size k,t
+            # (or) convert into compressed matrix of singular values of shape (k,t)
             Minv(S_mat)
             if svals_matrix_form
             else _singular_vals_mat_to_tensor(Minv(S_mat), *A.shape),
@@ -382,7 +383,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         # perform a default transformation
         if self.M is None:  # and Minv is None - guaranteed by assertion
             self.M_, self.Minv_ = _generate_default_m_transform_pair(X.shape[2])
-        else: 
+        else:
             self.M_, self.Minv_ = self.M, self.Minv
 
         # perform tensor decomposition via Kilmer's tSVDM

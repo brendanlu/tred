@@ -8,10 +8,10 @@ GLOBAL_SEED = 1
 
 # various n, p, t sizes
 # ensure n > p, p > n inputs are tested
-TENSOR_SIZES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
+TENSOR_SHAPES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
 
 
-@pytest.mark.parametrize("tensor_size", TENSOR_SIZES)
+@pytest.mark.parametrize("tensor_size", TENSOR_SHAPES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("rectangular_offset", [0, 5])
 def test_facewise_product(tensor_size, include_negatives, rectangular_offset):
