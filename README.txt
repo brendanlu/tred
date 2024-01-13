@@ -14,6 +14,19 @@ as possible.
 For the underlying tensor-product framework and tensor t-SVDM, see [1]. 
 For the explicit rank truncation, and the TCAM algorithm, see [2]. 
 
+Use
+---
+[MORE USER-FRIENDLY EXAMPLES WILL BE UP SOON]
+
+tred is on PyPI, simply run
+        pip install --upgrade tred
+To use the package. 
+
+tred is in active development. But, most of the existing implementations are 
+covered by unit tests, and we aim to keep the API relatively stable. 
+
+Users are highly encouraged to visit the GitHub site, and open issues.
+
 Literature
 ----------
 [1] Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor 
@@ -31,22 +44,29 @@ means k = n, as p >> n typically.
 
 Development
 -----------
-For anyone who is interested in adding to the package.
+For anyone who is interested in adding to the package:
 
-For development dependencies
-    pip install -r requirements.txt
+    For development dependencies, invoke:
+            pip install -r requirements.txt
+    In the root to install all of the required packages for development. 
 
-To test any changes, invoke
-    pytest . 
-In the root to run the tests in the test folder.
+    To test any changes, invoke:
+            pytest . 
+    In the root to run the tests in the test folder.
 
-Please kindly run 
-    black . 
-In the root to autoformat code when opening pull requests to this repo.  
+    If opening pull requests, invoke:
+            black . 
+    In the root to autoformat code. 
+
+    To build an updated version of the docs, invoke:
+            pdoc --html --output-dir docs tred
+    In the root to generate the docs in html under a `docs` directory. 
 
 Much of the implementation and code practice mirrors that of scikit-learn. We
-adopt their utilities and general coding guidelines whenever we can. Be very
-liberal in adding tests, both for new and existing features!
+adopt their utilities and general coding guidelines whenever we can. 
+
+For any interested contributors, please be very liberal in adding tests, both 
+for new and existing features. 
 
 Credit
 ------
@@ -58,7 +78,3 @@ And also by
 Future
 ------
 New experimental methods may be added to tred. 
-
-Users are highly encouraged to visit the GitHub site, and open issues. We are 
-very interested in optimizing the efficiency of the existing implementations, or 
-providing support for more general Python array frameworks - if needs arise. 

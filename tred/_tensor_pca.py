@@ -18,7 +18,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._tensor_ops import facewise_product, _rank_q_truncation_zero_out
 from ._utils import RealNotInt, _singular_vals_mat_to_tensor
-from ._m_transforms import generate_DCTii_M_transform_pair
+from ._m_transforms import generate_dctii_m_transform_pair
 
 
 def _generate_default_m_transform_pair(t):
@@ -48,7 +48,7 @@ def _generate_default_m_transform_pair(t):
     # as introduced by Kilmer et al. (2021) and applied by Mor et al. (2022), we currently
     # use the Discrete Cosine transform
     # see https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html
-    return generate_DCTii_M_transform_pair(t)
+    return generate_dctii_m_transform_pair(t)
 
 
 def tsvdm(

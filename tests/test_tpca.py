@@ -5,7 +5,7 @@ import pytest
 import scipy
 from numpy.testing import assert_allclose
 
-from tred import TPCA, tsvdm, m_product, generate_DCTii_M_transform_pair
+from tred import TPCA, tsvdm, m_product, generate_dctii_m_transform_pair
 
 GLOBAL_SEED = 1
 
@@ -54,7 +54,7 @@ def test_tsvdm(tensor_size, element_scale, include_negatives):
         - include_negatives * 0.5 * element_scale
     )
 
-    M, Minv = generate_DCTii_M_transform_pair(t)
+    M, Minv = generate_dctii_m_transform_pair(t)
     U, S, V = tsvdm(X, M=M, Minv=Minv)
     Vt = V.transpose(1, 0, 2)
 
