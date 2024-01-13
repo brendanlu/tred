@@ -55,8 +55,8 @@ def generate_dstii_m_transform_pair(t, *, norm="ortho"):
         t : int
             The length of the transform
 
-        norm : {“backward”, “ortho”, “forward”}, default="backward"
-            See https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html#scipy.fft.fft
+        norm : {“backward”, “ortho”, “forward”}, default="ortho"
+            See https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dst.html#scipy.fft.dst
 
     Returns
     -------
