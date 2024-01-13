@@ -382,6 +382,8 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         # perform a default transformation
         if self.M is None:  # and Minv is None - guaranteed by assertion
             self.M_, self.Minv_ = _generate_default_m_transform_pair(X.shape[2])
+        else: 
+            self.M_, self.Minv_ = self.M, self.Minv
 
         # perform tensor decomposition via Kilmer's tSVDM
         hatU, hatS_mat, hatV = tsvdm(
