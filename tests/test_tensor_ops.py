@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from tred import facewise_product, m_product
+from tred import facewise_product
 
 GLOBAL_SEED = 1
 
@@ -14,10 +14,8 @@ TENSOR_SIZES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
 @pytest.mark.parametrize("tensor_size", TENSOR_SIZES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("rectangular_offset", [0, 2, 5])
-def test_product_ops(tensor_size, include_negatives, rectangular_offset):
-    """Test module implementations with mathematically clearer (but less efficient)
-    implementations
-    """
+def test_prod_ops(tensor_size, include_negatives, rectangular_offset):
+    """Compare with mathematically clearer (but less efficient) implementations"""
     # scaling constants (arbitrary)
     C1 = 5
     C2 = 6

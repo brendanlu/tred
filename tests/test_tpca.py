@@ -1,11 +1,11 @@
-from packaging.version import parse as parse_version
+from functools import reduce
 
 import numpy as np
 import pytest
 import scipy
 from numpy.testing import assert_allclose
 
-from tred import TPCA, tsvdm
+from tred import TPCA, tsvdm, m_product, generate_DCTii_M_transform_pair
 
 GLOBAL_SEED = 1
 
@@ -37,6 +37,33 @@ def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
     )
     assert_allclose(tpca1.mean_, tpca2.mean_, rtol=rtol, atol=atol)
     assert_allclose(tpca1.rho_, tpca2.rho_, rtol=rtol, atol=atol)
+
+
+@pytest.mark.parametrize("tensor_size", TENSOR_SIZES)
+@pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
+@pytest.mark.parametrize("include_negatives", [0, 1])
+def test_tsvdm(tensor_size, element_scale, include_negatives):
+    rng = np.random.default_rng(seed=GLOBAL_SEED)
+
+    n, p, t = tensor_size
+
+    # tensors of various sizes with uniformly distributed elements
+    # within [0, tensor_size) or [-0.5*tensor_size, 0.5*tensor_size)
+    X = (
+        rng.random(size=tensor_size) * element_scale
+        - include_negatives * 0.5 * element_scale
+    )
+
+    M, Minv = generate_DCTii_M_transform_pair(t)
+    U, S, V = tsvdm(X, M=M, Minv=Minv)
+    Vt = V.transpose(1, 0, 2)
+
+    def m_product_wrapper(A, B):
+        """m-product with fixed M and Minv to use for functools reduce"""
+        return m_product(A, B, M=M, Minv=Minv)
+
+    X_reconstruct = reduce(m_product_wrapper, (U, S, Vt))
+    assert_allclose(X, X_reconstruct)
 
 
 @pytest.mark.parametrize("tensor_size", TENSOR_SIZES)
