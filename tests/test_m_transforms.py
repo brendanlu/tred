@@ -14,7 +14,7 @@ GLOBAL_SEED = 1
 TENSOR_SHAPES = [(4, 3, 2), (5, 7, 6), (2, 2, 6)]
 MATRIX_SHAPES = [(4, 6), (7, 3)]
 
-TRANSFORM_FAMILY_GENERATORS = [
+SCIPY_GENERATORS = [
     generate_dctii_m_transform_pair,
     generate_dstii_m_transform_pair,
 ]
@@ -74,7 +74,7 @@ def test_generate_transform_pair_from_matrix_for_matrix_target(matrix_shape):
 
 
 @pytest.mark.parametrize("shape", TENSOR_SHAPES + MATRIX_SHAPES)
-@pytest.mark.parametrize("transform_generator", TRANSFORM_FAMILY_GENERATORS)
+@pytest.mark.parametrize("transform_generator", SCIPY_GENERATORS)
 def test_scipy_fft_wrapper_transforms(shape, transform_generator):
     # scaling constant (arbitrary)
     C = 5
