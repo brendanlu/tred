@@ -127,16 +127,28 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
     return rho
 
 
-def _mode0_unfold(tens):
-    """As defined here https://jeankossaifi.com/blog/unfolding.html, there seem to be
-    contradicting definitions and implementations using this same name.
+def _mode_1_unfold(tens):
+    """Return mode-1 unfolding. There appear to be contradicting definitions in 
+    literature.
+    
+    For clarification, see mode-1 unfolding definition used in Kilmer et al. (2021), 
+    which is instead called mode-0 unfolding found at: 
+    https://jeankossaifi.com/blog/unfolding.html
 
     NOTE: NOT USED so far in this package. Probably redundant later if we adopt a more
     intuitive tensor package in Python.
+
+    References
+    ----------
+    `Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor
+    algebra for optimal representation and compression of multiway data. Proceedings
+    of the National Academy of Sciences, 118(28), p.e2015851118.`    
     """
     # unfold the n x p x t tensor into a n x pt 2d array (matrix), where each frontal
-    # slice sits 'next' each other. first transpose into a n-vertical-stack of t x p
-    # matrices. looking downwards, with C-memory layout, ravel followed by reshaping into
-    # a n x pt matrix gives the intended result; the unfolding has the same tensor
-    # semantics as singular_values_ in the fit method
+    # slice sits 'next' each other. 
+    #
+    # first transpose into a n-vertical-stack of t x p matrices. looking downwards, 
+    # with C-memory layout, ravel followed by reshaping into a n x pt matrix gives the 
+    # intended result; the unfolding has the same tensor semantics as singular_values_ in 
+    # the fit method
     return tens.transpose(0, 2, 1).reshape((tens.shape[0], -1), order="C")

@@ -107,6 +107,12 @@ def tsvdm(
             if svals_matrix_form==False, S_mat of shape (k, t) returned instead
 
         V_tens : ndarray, shape: (p, p, t) if full_frontal_slices==True else (p, k, t)
+
+    References
+    ----------
+    `Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor
+    algebra for optimal representation and compression of multiway data. Proceedings
+    of the National Academy of Sciences, 118(28), p.e2015851118.`
     """
 
     assert len(A.shape) == 3, "Ensure order-3 tensor input"
