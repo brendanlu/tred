@@ -144,7 +144,7 @@ def tsvdm(
         return (
             hatU,
             # by default return S as n,p,t f-diagonal tensor, matching literature
-            # (optionally) convert into compressed matrix of singular values of size k,t
+            # (or) convert into compressed matrix of singular values of shape (k,t)
             S_mat
             if svals_matrix_form
             else _singular_vals_mat_to_tensor(S_mat, *A.shape),

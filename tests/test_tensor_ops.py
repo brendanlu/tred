@@ -39,7 +39,8 @@ def test_facewise_product(tensor_size, include_negatives, rectangular_offset):
     assert_allclose(fp_expected, facewise_product(A, B))
 
 
-def test_unfolding_explicit():
+@pytest.mark.parametrize("view", [True, False])
+def test_unfolding_explicit(view):
     """Explicitly test and assert the mode-n unfolding example given in:
     Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
     review, 51(3), pp.455-500.
@@ -76,6 +77,6 @@ def test_unfolding_explicit():
         ]
     )
 
-    assert np.array_equal(_mode_1_unfold(X), X_m1_expected)
-    assert np.array_equal(_mode_2_unfold(X), X_m2_expected)
-    assert np.array_equal(_mode_3_unfold(X), X_m3_expected)
+    assert np.array_equal(_mode_1_unfold(X, view=view), X_m1_expected)
+    assert np.array_equal(_mode_2_unfold(X, view=view), X_m2_expected)
+    assert np.array_equal(_mode_3_unfold(X, view=view), X_m3_expected)

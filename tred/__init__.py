@@ -5,6 +5,7 @@ strategies for order-3 datasets of size n, p, t, where p >> n > t.
 """
 
 from ._m_transforms import (
+    generate_transform_pair_from_matrix,
     generate_dstii_m_transform_pair,
     generate_dctii_m_transform_pair,
 )
@@ -17,6 +18,7 @@ from ._utils import display_tensor_facewise
 from ._tensor_ops import _mode_1_unfold, _mode_2_unfold, _mode_3_unfold
 
 __all__ = [
+    "generate_transform_pair_from_matrix",
     "generate_dctii_m_transform_pair",
     "generate_dstii_m_transform_pair",
     "facewise_product",
