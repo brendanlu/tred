@@ -11,17 +11,17 @@ GLOBAL_SEED = 1
 TENSOR_SHAPES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
 
 
-@pytest.mark.parametrize("tensor_size", TENSOR_SHAPES)
+@pytest.mark.parametrize("tensor_shape", TENSOR_SHAPES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("rectangular_offset", [0, 5])
-def test_facewise_product(tensor_size, include_negatives, rectangular_offset):
+def test_facewise_product(tensor_shape, include_negatives, rectangular_offset):
     """Compare with mathematically clearer (but less efficient) implementations"""
     # scaling constants (arbitrary)
     C1 = 5
     C2 = 6
 
     rng = np.random.default_rng(seed=GLOBAL_SEED)
-    n, p, t = tensor_size
+    n, p, t = tensor_shape
 
     # generate some compatibly sized tensors
     A = rng.random(size=((n, p, t))) * C1 - include_negatives * 0.5 * C1

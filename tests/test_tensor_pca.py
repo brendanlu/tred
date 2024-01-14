@@ -58,18 +58,18 @@ def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
     assert_allclose(tpca1.rho_, tpca2.rho_, rtol=rtol, atol=atol)
 
 
-@pytest.mark.parametrize("tensor_size", TENSOR_SHAPES)
+@pytest.mark.parametrize("tensor_shape", TENSOR_SHAPES)
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("transform_generator", TRANSFORM_FAMILY_GENERATORS)
-def test_tsvdm(tensor_size, element_scale, include_negatives, transform_generator):
+def test_tsvdm(tensor_shape, element_scale, include_negatives, transform_generator):
     rng = np.random.default_rng(seed=GLOBAL_SEED)
-    n, p, t = tensor_size
+    n, p, t = tensor_shape
 
     # tensors of various sizes with uniformly distributed elements
-    # within [0, tensor_size) or [-0.5*tensor_size, 0.5*tensor_size)
+    # within [0, tensor_shape) or [-0.5*tensor_shape, 0.5*tensor_shape)
     X = (
-        rng.random(size=tensor_size) * element_scale
+        rng.random(size=tensor_shape) * element_scale
         - include_negatives * 0.5 * element_scale
     )
 
@@ -89,13 +89,13 @@ def test_tsvdm(tensor_size, element_scale, include_negatives, transform_generato
     assert_allclose(X, X_reconstruct)
 
 
-@pytest.mark.parametrize("tensor_size", TENSOR_SHAPES)
+@pytest.mark.parametrize("tensor_shape", TENSOR_SHAPES)
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("n_components", [None, 1, 6, 0.3, 0.8])
 @pytest.mark.parametrize("transform_generator", TRANSFORM_FAMILY_GENERATORS)
 def test_tpca(
-    tensor_size, element_scale, include_negatives, n_components, transform_generator
+    tensor_shape, element_scale, include_negatives, n_components, transform_generator
 ):
     """Make sure different inputs work, and perform basic sense checks"""
     RTOL = 1e-7
@@ -103,16 +103,16 @@ def test_tpca(
 
     rng = np.random.default_rng(seed=GLOBAL_SEED)
 
-    n, p, t = tensor_size
+    n, p, t = tensor_shape
     k = min(n, p)
 
     M, Minv = transform_generator(t)
     tpca = TPCA(n_components=n_components, M=M, Minv=Minv)
 
     # tensors of various sizes with uniformly distributed elements
-    # within [0, tensor_size) or [-0.5*tensor_size, 0.5*tensor_size)
+    # within [0, tensor_shape) or [-0.5*tensor_shape, 0.5*tensor_shape)
     X = (
-        rng.random(size=tensor_size) * element_scale
+        rng.random(size=tensor_shape) * element_scale
         - include_negatives * 0.5 * element_scale
     )
 
