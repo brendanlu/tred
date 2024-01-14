@@ -14,7 +14,7 @@ from ._utils import display_tensor_facewise
 
 # private - for testing
 ##########################################################################################
-from ._tensor_ops import _mode_1_unfold, _mode_3_unfold
+from ._tensor_ops import _mode_1_unfold, _mode_2_unfold, _mode_3_unfold
 
 __all__ = [
     "generate_dctii_m_transform_pair",

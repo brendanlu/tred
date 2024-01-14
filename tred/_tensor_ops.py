@@ -155,6 +155,20 @@ def _mode_1_unfold(tens):
     return tens.transpose(0, 2, 1).reshape((tens.shape[0], -1), order="C").copy()
 
 
+def _mode_2_unfold(tens):
+    """Return mode-2 unfolding copy, as defined in Kolda et al.
+
+    NOTE: NOT USED so far in this package. Probably redundant later if we adopt a more
+    intuitive tensor package in Python (TensorLy?).
+
+    References
+    ----------
+    `Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
+    review, 51(3), pp.455-500.`
+    """
+    return tens.transpose(1, 2, 0).reshape((tens.shape[1], -1), order="C").copy()
+
+
 def _mode_3_unfold(tens):
     """Return mode-3 unfolding copy, as defined in Kolda et al.
 

@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from tred import facewise_product, _mode_1_unfold, _mode_3_unfold
+from tred import facewise_product, _mode_1_unfold, _mode_2_unfold, _mode_3_unfold
 
 GLOBAL_SEED = 1
 
@@ -67,5 +67,15 @@ def test_unfolding_explicit():
         ]
     )
 
+    X_m2_expected = np.array(
+        [
+            [1, 2, 3, 13, 14, 15],
+            [4, 5, 6, 16, 17, 18],
+            [7, 8, 9, 19, 20, 21],
+            [10, 11, 12, 22, 23, 24],
+        ]
+    )
+
     assert np.array_equal(_mode_1_unfold(X), X_m1_expected)
+    assert np.array_equal(_mode_2_unfold(X), X_m2_expected)
     assert np.array_equal(_mode_3_unfold(X), X_m3_expected)
