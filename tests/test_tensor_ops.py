@@ -8,7 +8,7 @@ GLOBAL_SEED = 1
 
 # various n, p, t sizes
 # ensure n > p, p > n inputs are tested
-TENSOR_SHAPES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
+TENSOR_SHAPES = [(4, 3, 2), (5, 7, 6), (2, 2, 6)]
 
 
 @pytest.mark.parametrize("tensor_shape", TENSOR_SHAPES)

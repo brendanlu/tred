@@ -23,7 +23,7 @@ GLOBAL_SEED = 1
 
 # various n, p, t sizes
 # ensure n > p, p > n inputs are tested
-TENSOR_SHAPES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
+TENSOR_SHAPES = [(4, 3, 2), (5, 7, 6), (2, 2, 6)]
 
 # m transforms to suit the tensor sizes above
 TRANSFORM_FAMILY_GENERATORS = [
@@ -67,7 +67,7 @@ def test_tsvdm(tensor_shape, element_scale, include_negatives, transform_generat
     n, p, t = tensor_shape
 
     # tensors of various sizes with uniformly distributed elements
-    # within [0, tensor_shape) or [-0.5*tensor_shape, 0.5*tensor_shape)
+    # within [0, element_scale) or [-0.5*element_scale, 0.5*element_scale)
     X = (
         rng.random(size=tensor_shape) * element_scale
         - include_negatives * 0.5 * element_scale
@@ -110,7 +110,7 @@ def test_tpca(
     tpca = TPCA(n_components=n_components, M=M, Minv=Minv)
 
     # tensors of various sizes with uniformly distributed elements
-    # within [0, tensor_shape) or [-0.5*tensor_shape, 0.5*tensor_shape)
+    # within [0, element_scale) or [-0.5*element_scale, 0.5*element_scale)
     X = (
         rng.random(size=tensor_shape) * element_scale
         - include_negatives * 0.5 * element_scale
