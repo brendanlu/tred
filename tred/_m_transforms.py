@@ -7,8 +7,6 @@ import numpy.linalg as linalg
 from scipy.fft import dct, idct, dst, idst
 
 
-from ._tensor_ops import _mode_3_unfold
-
 # the transform generator functions below all work for:
 #   1. order 3 tensors: by applying the transform along the tubal fibres
 #   2. matrices: by applying the transform along the rows
