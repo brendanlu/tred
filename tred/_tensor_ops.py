@@ -24,7 +24,7 @@ def facewise_product(A, B):
     """
     # return np.einsum('mpi,pli->mli', A, B)
     # the following is a quicker version of the above using numpy broadcasting
-    return np.matmul(A.transpose(2, 0, 1), B.transpose(2, 0, 1)).transpose(1, 2, 0)
+    return (A.transpose(2, 0, 1) @ B.transpose(2, 0, 1)).transpose(1, 2, 0)
 
 
 def m_product(A, B, M, Minv):

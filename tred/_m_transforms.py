@@ -62,31 +62,24 @@ def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
                 "Input matrix must be invertible, but appears singular, or close to singular"
             )
 
-    # we can probably avoid the roundabout calls to reshape and just use numpy
-    # broadcasting
+    # a quick way of applying M along the tubal fibres of X, using np broadcasting:
+    # transpose X into a n x t x p vertical stack of t x p matrices. matrix
+    # multiplication is broadcast vertically, whereby M multiplies each of the t x p
+    # matrices, effectively applying the transform to the columns, which were the original
+    # tubal fibres. then transpose back to original
     def M(X):
         _assert_t_and_order(X, t_)
         if len(X.shape) == 2:
-            return M_mat @ X.T
+            return (M_mat @ X.T).T
         else:  # len(X.shape == 3)
-            n, p, t = X.shape
-            return (
-                (M_mat @ _mode_3_unfold(X))
-                .reshape((t, p, n), order="C")
-                .transpose(2, 1, 0)
-            )
+            return (M_mat @ X.transpose(0, 2, 1)).transpose(0, 2, 1)
 
     def Minv(X):
         _assert_t_and_order(X, t_)
         if len(X.shape) == 2:
-            return Minv_mat @ X.T
+            return (Minv_mat @ X.T).T
         else:  # len(X.shape == 3)
-            n, p, t = X.shape
-            return (
-                (Minv_mat @ _mode_3_unfold(X))
-                .reshape((t, p, n), order="C")
-                .transpose(2, 1, 0)
-            )
+            return (Minv_mat @ X.transpose(0, 2, 1)).transpose(0, 2, 1)
 
     return M, Minv
 
