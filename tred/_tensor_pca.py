@@ -21,7 +21,7 @@ from ._utils import RealNotInt, _singular_vals_mat_to_tensor
 from ._m_transforms import generate_dctii_m_transform_pair
 
 
-def _generate_default_m_transform_pair(t):
+def generate_default_m_transform_pair(t):
     """Wrapper for a function that generates functions M and Minv given the length of
     a tubal fibre.
 
@@ -73,11 +73,11 @@ def tsvdm(
         A : ArrayLike, shape: (n, p, t)
             $n \times p \times t$ data tensor
 
-        M : Callable[[ArrayLike], ndarray]
+        M : Callable[[ArrayLike], ndarray] or None, default=None
             A function which, given some order-3 tensor, returns it under some $\times_3$
             invertible transformation.
 
-        MInv : Callable[[ArrayLike], ndarray]
+        MInv : Callable[[ArrayLike], ndarray] or None, default=None
             The inverse transformation of M
 
         keep_hats : bool, default=False
@@ -111,7 +111,7 @@ def tsvdm(
     ), "If explicitly defined, both M and its inverse must be defined"
 
     if M is None:  # and Minv is None - guaranteed by assertion
-        M, Minv = _generate_default_m_transform_pair(A.shape[-1])
+        M, Minv = generate_default_m_transform_pair(A.shape[-1])
 
     # transform the tensor to new space via the mode-3 product
     hatA = M(A)
@@ -382,7 +382,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         # if there is no explicitly defined transform in __init__, assign functions to
         # perform a default transformation
         if self.M is None:  # and Minv is None - guaranteed by assertion
-            self.M_, self.Minv_ = _generate_default_m_transform_pair(X.shape[2])
+            self.M_, self.Minv_ = generate_default_m_transform_pair(X.shape[2])
         else:
             self.M_, self.Minv_ = self.M, self.Minv
 

@@ -9,7 +9,7 @@ from ._m_transforms import (
     generate_dctii_m_transform_pair,
 )
 from ._tensor_ops import facewise_product, m_product
-from ._tensor_pca import tsvdm, TPCA
+from ._tensor_pca import generate_default_m_transform_pair, tsvdm, TPCA
 from ._utils import display_tensor_facewise
 
 __all__ = [
@@ -17,6 +17,7 @@ __all__ = [
     "generate_dstii_m_transform_pair",
     "facewise_product",
     "m_product",
+    "generate_default_m_transform_pair",
     "tsvdm",
     "TPCA",
     "display_tensor_facewise",

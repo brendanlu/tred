@@ -5,12 +5,19 @@ import pytest
 from numpy.testing import assert_allclose
 
 from tred import (
+    generate_default_m_transform_pair,
     TPCA,
     tsvdm,
     m_product,
     generate_dctii_m_transform_pair,
     generate_dstii_m_transform_pair,
 )
+
+
+def _dummy_default_transform_generator(t):
+    """Return M=None, Minv=None to test default m-transform configuration"""
+    return None, None
+
 
 GLOBAL_SEED = 1
 
@@ -20,12 +27,13 @@ TENSOR_SHAPES = [(10, 3, 2), (5, 50, 5), (2, 2, 15)]
 
 # m transforms to suit the tensor sizes above
 TRANSFORM_FAMILY_GENERATORS = [
+    _dummy_default_transform_generator,
     generate_dctii_m_transform_pair,
     generate_dstii_m_transform_pair,
 ]
 
 # test tiny, small, medium, and large numbers
-ELEMENT_SCALES = [10**i for i in range(-2, 4)]
+ELEMENT_SCALES = [10**i for i in range(-2, 5, 2)]
 
 
 def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
@@ -68,6 +76,9 @@ def test_tsvdm(tensor_size, element_scale, include_negatives, transform_generato
     M, Minv = transform_generator(t)
     U, S, V = tsvdm(X, M=M, Minv=Minv)
     Vt = V.transpose(1, 0, 2)
+
+    if M is None:
+        M, Minv = generate_default_m_transform_pair(t)
 
     def m_product_wrapper(A, B):
         """m-product with fixed M and Minv to use for functools reduce"""
