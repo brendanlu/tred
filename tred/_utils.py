@@ -47,6 +47,7 @@ def display_tensor_facewise(tens):
     [0.]
     [1.]]]
     >>> disp(test)
+    Tensor with dimensions (3, 3, 1)
     [[[1. 0. 0.]
     [0. 1. 0.]
     [0. 0. 1.]]]
