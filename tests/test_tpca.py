@@ -33,7 +33,7 @@ TRANSFORM_FAMILY_GENERATORS = [
 ]
 
 # test tiny, small, medium, and large numbers
-ELEMENT_SCALES = [10**i for i in range(-2, 5, 2)]
+ELEMENT_SCALES = [10**i for i in range(-4, 5, 2)]
 
 
 def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
