@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from tred import facewise_product
+from tred import facewise_product, _mode_1_unfold, _mode_3_unfold
 
 GLOBAL_SEED = 1
 
@@ -37,3 +37,35 @@ def test_facewise_product(tensor_size, include_negatives, rectangular_offset):
         fp_expected[:, :, i] = A[:, :, i] @ B[:, :, i]
 
     assert_allclose(fp_expected, facewise_product(A, B))
+
+
+def test_unfolding_explicit():
+    """Explicitly test and assert the mode-n unfolding example given in:
+    Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
+    review, 51(3), pp.455-500.
+    """
+    X = np.array(
+        [
+            [[1, 13], [4, 16], [7, 19], [10, 22]],
+            [[2, 14], [5, 17], [8, 20], [11, 23]],
+            [[3, 15], [6, 18], [9, 21], [12, 24]],
+        ]
+    )
+
+    X_m1_expected = np.array(
+        [
+            [1, 4, 7, 10, 13, 16, 19, 22],
+            [2, 5, 8, 11, 14, 17, 20, 23],
+            [3, 6, 9, 12, 15, 18, 21, 24],
+        ]
+    )
+
+    X_m3_expected = np.array(
+        [
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
+        ]
+    )
+
+    assert np.array_equal(_mode_1_unfold(X), X_m1_expected)
+    assert np.array_equal(_mode_3_unfold(X), X_m3_expected)

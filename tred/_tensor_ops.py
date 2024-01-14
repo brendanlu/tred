@@ -158,8 +158,8 @@ def _mode_1_unfold(tens):
 def _mode_3_unfold(tens):
     """Return mode-3 unfolding copy, as defined in Kolda et al.
 
-    NOTE: NOT USED so far in this package. Probably redundant later if we adopt a more
-    intuitive tensor package in Python (TensorLy?).
+    NOTE: Probably redundant later if we adopt a more intuitive tensor package in Python
+    (TensorLy?).
 
     References
     ----------

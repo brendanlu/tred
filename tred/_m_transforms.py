@@ -5,6 +5,25 @@ import os
 from scipy.fft import dct, idct, dst, idst
 
 
+def generate_transform_pair_from_matrix(mat, inv=None):
+    """Generate a pair of functions, from a matrix specification, to use within the
+    m-product framework.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    References
+    ----------
+    `Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor
+    algebra for optimal representation and compression of multiway data. Proceedings
+    of the National Academy of Sciences, 118(28), p.e2015851118.`
+    """
+    pass
+
+
 def generate_dctii_m_transform_pair(t, *, norm="ortho"):
     """Wrapper around scipy fft to generate functions to perform $\times_3 M$ operations
     on order-3 tensors, where $M$ is the (scaled) Discrete Cosine Transform.
