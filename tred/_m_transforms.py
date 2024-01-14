@@ -9,8 +9,6 @@ def generate_dctii_m_transform_pair(t, *, norm="ortho"):
     """Wrapper around scipy fft to generate functions to perform $\times_3 M$ operations
     on order-3 tensors, where $M$ is the (scaled) Discrete Cosine Transform.
 
-    As introduced by Mor et al. (2022)
-
     Parameters
     ----------
         t : int
@@ -30,6 +28,7 @@ def generate_dctii_m_transform_pair(t, *, norm="ortho"):
 
     References
     ----------
+    The use of this transform with the m-product was introduced in:
     `Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron,
     H., 2022. Dimensionality reduction of longitudinal’omics data using modern
     tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.`

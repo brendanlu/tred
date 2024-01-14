@@ -47,6 +47,7 @@ def generate_default_m_transform_pair(t):
 
     References
     ----------
+    The use of this transform with the m-product was introduced in:
     `Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron,
     H., 2022. Dimensionality reduction of longitudinal’omics data using modern
     tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.`
