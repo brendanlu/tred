@@ -12,6 +12,10 @@ from ._tensor_ops import facewise_product, m_product
 from ._tensor_pca import generate_default_m_transform_pair, tsvdm, TPCA
 from ._utils import display_tensor_facewise
 
+# private - for testing
+##########################################################################################
+from ._tensor_ops import _mode_1_unfold, _mode_3_unfold
+
 __all__ = [
     "generate_dctii_m_transform_pair",
     "generate_dstii_m_transform_pair",

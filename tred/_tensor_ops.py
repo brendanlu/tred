@@ -128,27 +128,42 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
 
 
 def _mode_1_unfold(tens):
-    """Return mode-1 unfolding. There appear to be contradicting definitions in 
-    literature.
-    
-    For clarification, see mode-1 unfolding definition used in Kilmer et al. (2021), 
-    which is instead called mode-0 unfolding found at: 
-    https://jeankossaifi.com/blog/unfolding.html
+    """Return mode-1 unfolding copy, as defined in Kolda et al.
 
     NOTE: NOT USED so far in this package. Probably redundant later if we adopt a more
-    intuitive tensor package in Python.
+    intuitive tensor package in Python (TensorLy?).
 
     References
     ----------
-    `Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor
-    algebra for optimal representation and compression of multiway data. Proceedings
-    of the National Academy of Sciences, 118(28), p.e2015851118.`    
+    `Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
+    review, 51(3), pp.455-500.`
     """
     # unfold the n x p x t tensor into a n x pt 2d array (matrix), where each frontal
-    # slice sits 'next' each other. 
+    # slice sits 'next' each other.
     #
-    # first transpose into a n-vertical-stack of t x p matrices. looking downwards, 
-    # with C-memory layout, ravel followed by reshaping into a n x pt matrix gives the 
-    # intended result; the unfolding has the same tensor semantics as singular_values_ in 
-    # the fit method
-    return tens.transpose(0, 2, 1).reshape((tens.shape[0], -1), order="C")
+    # NUMPY NOTES:
+    # first transpose into a n-vertical-stack of t x p matrices. reshape is equivalent
+    # to 'ravel'-ling first, before reshaping the vector (using the same memory format)
+    # into the intended shape. in "C" memory format, the last indexes move the quickest,
+    # so ravel moves along the p index, and then the t index, and then the n index.
+    # when placing this into the matrix form, we get the intended result, where for the
+    # same t and n, the p values sit next to each other; for the same n, all of its t
+    # values sit together on the same row. then the matrix shape ensures that each row
+    # has a distinct n
+    #
+    # the unfolding has the same tensor semantics as singular_values_ in the fit method
+    return tens.transpose(0, 2, 1).reshape((tens.shape[0], -1), order="C").copy()
+
+
+def _mode_3_unfold(tens):
+    """Return mode-3 unfolding copy, as defined in Kolda et al.
+
+    NOTE: NOT USED so far in this package. Probably redundant later if we adopt a more
+    intuitive tensor package in Python (TensorLy?).
+
+    References
+    ----------
+    `Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
+    review, 51(3), pp.455-500.`
+    """
+    return tens.transpose(2, 1, 0).reshape((tens.shape[2], -1), order="C").copy()
