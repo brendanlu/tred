@@ -127,7 +127,7 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
     return rho
 
 
-def _mode_1_unfold(tens):
+def _mode_1_unfold(tens, view=False):
     """Return mode-1 unfolding copy, as defined in Kolda et al.
 
     NOTE: NOT USED so far in this package. Probably redundant later if we adopt a more
@@ -152,10 +152,13 @@ def _mode_1_unfold(tens):
     # has a distinct n
     #
     # the unfolding has the same tensor semantics as singular_values_ in the fit method
-    return tens.transpose(0, 2, 1).reshape((tens.shape[0], -1), order="C").copy()
+    if view:
+        return tens.view().transpose(0, 2, 1).reshape((tens.shape[0], -1), order="C")
+    else:
+        return tens.copy().transpose(0, 2, 1).reshape((tens.shape[0], -1), order="C")
 
 
-def _mode_2_unfold(tens):
+def _mode_2_unfold(tens, view=False):
     """Return mode-2 unfolding copy, as defined in Kolda et al.
 
     NOTE: NOT USED so far in this package. Probably redundant later if we adopt a more
@@ -166,10 +169,13 @@ def _mode_2_unfold(tens):
     `Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
     review, 51(3), pp.455-500.`
     """
-    return tens.transpose(1, 2, 0).reshape((tens.shape[1], -1), order="C").copy()
+    if view:
+        return tens.view().transpose(1, 2, 0).reshape((tens.shape[1], -1), order="C")
+    else:
+        return tens.copy().transpose(1, 2, 0).reshape((tens.shape[1], -1), order="C")
 
 
-def _mode_3_unfold(tens):
+def _mode_3_unfold(tens, view=False):
     """Return mode-3 unfolding copy, as defined in Kolda et al.
 
     NOTE: Probably redundant later if we adopt a more intuitive tensor package in Python
@@ -180,4 +186,7 @@ def _mode_3_unfold(tens):
     `Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
     review, 51(3), pp.455-500.`
     """
-    return tens.transpose(2, 1, 0).reshape((tens.shape[2], -1), order="C").copy()
+    if view:
+        return tens.view().transpose(2, 1, 0).reshape((tens.shape[2], -1), order="C")
+    else:
+        return tens.copy().transpose(2, 1, 0).reshape((tens.shape[2], -1), order="C")
