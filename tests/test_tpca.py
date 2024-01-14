@@ -77,6 +77,7 @@ def test_tsvdm(tensor_size, element_scale, include_negatives, transform_generato
     U, S, V = tsvdm(X, M=M, Minv=Minv)
     Vt = V.transpose(1, 0, 2)
 
+    # make sure that the m-product below has a 'non-None' set of inputs for M and Minv
     if M is None:
         M, Minv = generate_default_m_transform_pair(t)
 
@@ -97,6 +98,9 @@ def test_tpca(
     tensor_size, element_scale, include_negatives, n_components, transform_generator
 ):
     """Make sure different inputs work, and perform basic sense checks"""
+    RTOL = 1e-7
+    ATOL = 1e-10
+
     rng = np.random.default_rng(seed=GLOBAL_SEED)
 
     n, p, t = tensor_size
@@ -125,7 +129,7 @@ def test_tpca(
     # check the equivalence of fit.transform and fit_transform
     # allow 1e-10 of absolute tolerance for small elements
     X_r2 = tpca.fit_transform(X)
-    assert_allclose(X_r, X_r2, rtol=1e-7, atol=1e-10)
+    assert_allclose(X_r, X_r2, rtol=RTOL, atol=ATOL)
 
     # test rho
     if n_components is None:

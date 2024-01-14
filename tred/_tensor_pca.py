@@ -28,7 +28,7 @@ def generate_default_m_transform_pair(t):
     Both the tsvdm and TPCA do not require the user to explicitly specify a tensor
     m-transform. In those cases, they rely on this function here.
 
-    We may choose to choose a different default family of mappings later
+    We may choose to choose a different default family of mappings later.
 
     Parameters
     ----------
@@ -44,10 +44,13 @@ def generate_default_m_transform_pair(t):
 
         Minv : Callable[[ArrayLike], ndarray]
             A tensor transform (the inverse of `fun_m`)
+
+    References
+    ----------
+    `Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron,
+    H., 2022. Dimensionality reduction of longitudinal’omics data using modern
+    tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.`
     """
-    # as introduced by Kilmer et al. (2021) and applied by Mor et al. (2022), we currently
-    # use the Discrete Cosine transform
-    # see https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html
     return generate_dctii_m_transform_pair(t)
 
 

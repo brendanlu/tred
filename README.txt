@@ -44,7 +44,7 @@ means k = n, as p >> n typically.
 
 Development
 -----------
-For anyone who is interested in adding to the package:
+For anyone who is interested in contributing to / modifying the package:
 
     For development dependencies, invoke:
             pip install -r requirements.txt
