@@ -59,7 +59,7 @@ For anyone who is interested in contributing to / modifying the package:
     In the root to autoformat code. 
 
     To build an updated version of the docs, invoke:
-            pdoc --html --output-dir docs tred
+            pdoc --html --config latex_math=True --output-dir docs tred
     In the root to generate the docs in html under a `docs` directory. 
 
 Much of the implementation and code practice mirrors that of scikit-learn. We

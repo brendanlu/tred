@@ -7,20 +7,20 @@ from ._utils import _singular_vals_tensor_to_mat
 
 
 def facewise_product(A, B):
-    """Facewise product s.t. $C_{:,:,i} = A_{:,:,i} B_{:,:,i}$.
+    """Facewise product s.t. \\(C_{:,:,i} = A_{:,:,i} B_{:,:,i}\\).
 
     Parameters
     ----------
-        A : ArrayLike of shape (a, b, d)
-            $a \times b \times d$ tensor representation
+        A : ndarray, shape (a, b, d)
+            Tensor represented in order-3 ndarray
 
-        B : ArrayLike of shape (b, c, d)
-            $b \times c \times d$ tensor representation
+        B : ndarray, shape (b, c, d)
+            Tensor represented in order-3 ndarray
 
     Returns
     -------
         C : ndarray, shape: (a, c, d)
-            facewise tensor product
+            Facewise tensor product
     """
     # return np.einsum('mpi,pli->mli', A, B)
     # the following is a quicker version of the above using numpy broadcasting
@@ -28,30 +28,33 @@ def facewise_product(A, B):
 
 
 def m_product(A, B, M, Minv):
-    """Kilmer et al. (2021) tensor m-product for order-3 tensors. See [1]
-
-    NOTE: NOT USED so far in this package. We tend to keep variables in the transformed
-    space, and therefore directly use the facewise_product function.
+    """Kilmer et al. (2021) tensor m-product for order-3 tensors. 
 
     Parameters
     ----------
-        A : ArrayLike of shape (a, b, d)
-            $a \times b \times d$ tensor representation
+        A : ndarray, shape (a, b, d)
+            Tensor represented in order-3 ndarray
 
-        B : ArrayLike of shape (b, c, d)
-            $b \times c \times d$ tensor representation
+        B : ndarray, shape (b, c, d)
+            Tensor represented in order-3 ndarray
 
         M : Callable[[ArrayLike], ndarray]
-            A function which, given some order-3 tensor, returns it under some $\times_3$
-            invertible transformation.
+            A function which, given some order-3 tensor, returns it under an orthogonal
+            tubal transformation
 
         MInv : Callable[[ArrayLike], ndarray]
-            The inverse transformation of M
+            A function implementing the inverse tubal transformation of M
 
     Returns
     -------
         m_product : ndarray, shape: (a, c, d)
             Tensor-tensor m-product as found in Kilmer et al. (2021)
+
+    References
+    ----------
+    Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor
+    algebra for optimal representation and compression of multiway data. Proceedings
+    of the National Academy of Sciences, 118(28), p.e2015851118.
     """
     assert (
         A.shape[1] == B.shape[0] and A.shape[2] == B.shape[2]
@@ -61,35 +64,40 @@ def m_product(A, B, M, Minv):
 
 
 def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
-    """Explicit rank-q truncation as in Mor et al. (2022). Truncate, via zeroing out, the
-    input arrays passed in by reference.
-
-    This will typically be called in the m-transformed ('hat') space.
+    """In-place explicit rank-q truncation as introduced in Mor et al. (2022). Truncates 
+    tensors U, S, V from a tsvdm decomposition to achieve an explicit rank of q. 
 
     Parameters
     ----------
-        hatU : ArrayLike of shape (n, k, t)
-            tensor U returned by tSVDM
+        hatU : ndarray, shape (n, k, t)
+            Tensor U from the tsvdm. 
 
-        hatS : ArrayLike of shape (k, k, t) or (k, t)
-            singular values tensor, or matrix representation, from tSVDM
+        hatS : ndarray, shape (k, k, t) or (k, t)
+            Tensor S from the tsvdm, or represented in compact matrix form. 
 
-        hatV : ArrayLike of shape (p, k, t)
-            tensor V returned by tSVDM
+        hatV : ndarray, shape (p, k, t)
+            Tensor V from the tSVDM
 
-        q : int
-            Explicit rank ``q``, of the truncation
+        q : int or None, default=None
+            Target explicit rank for the truncation
 
-        sigma_q : float
-            If ``sigma_q`` is set, then the ``q`` input parameter will be ignored. Saves
-            computation time by passing in the q-th largest singular value, which
-            may be cheap from the calling state if a sorted array of singular values has
-            already been computed.
+        sigma_q : float or None, default=None
+            The `q`-th largest singular value. This will not be checked, and assumed to
+            be a valid singular value in the inputted decomposition. 
+
+            If `sigma_q` is set, then the `q` input parameter will be ignored. Saves
+            re-computation of the `q`-th largest singular value. 
 
     Returns
     -------
-        None
-            Modifies inputs in-place
+        rho : ndarray, shape (q,)
+            The multi-rank which results from the choice of `q` (or `sigma_q`)
+            
+    References
+    ----------
+    Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron,
+    H., 2022. Dimensionality reduction of longitudinal’omics data using modern
+    tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.
     """
     assert not (q is None and sigma_q is None), "Please specify either q or sigma_q"
 
@@ -130,13 +138,10 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
 def _mode_1_unfold(tens, view=False):
     """Return mode-1 unfolding copy, as defined in Kolda et al.
 
-    NOTE: NOT USED so far in this package. Probably redundant later if we adopt a more
-    intuitive tensor package in Python (TensorLy?).
-
     References
     ----------
-    `Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
-    review, 51(3), pp.455-500.`
+    Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
+    review, 51(3), pp.455-500.
     """
     # unfold the n x p x t tensor into a n x pt 2d array (matrix), where each frontal
     # slice sits 'next' each other.
@@ -161,13 +166,10 @@ def _mode_1_unfold(tens, view=False):
 def _mode_2_unfold(tens, view=False):
     """Return mode-2 unfolding copy, as defined in Kolda et al.
 
-    NOTE: NOT USED so far in this package. Probably redundant later if we adopt a more
-    intuitive tensor package in Python (TensorLy?).
-
     References
     ----------
-    `Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
-    review, 51(3), pp.455-500.`
+    Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
+    review, 51(3), pp.455-500.
     """
     if view:
         return tens.view().transpose(1, 2, 0).reshape((tens.shape[1], -1), order="C")
@@ -178,13 +180,10 @@ def _mode_2_unfold(tens, view=False):
 def _mode_3_unfold(tens, view=False):
     """Return mode-3 unfolding copy, as defined in Kolda et al.
 
-    NOTE: Probably redundant later if we adopt a more intuitive tensor package in Python
-    (TensorLy?).
-
     References
     ----------
-    `Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
-    review, 51(3), pp.455-500.`
+    Kolda, T.G. and Bader, B.W., 2009. Tensor decompositions and applications. SIAM
+    review, 51(3), pp.455-500.
     """
     if view:
         return tens.view().transpose(2, 1, 0).reshape((tens.shape[2], -1), order="C")
