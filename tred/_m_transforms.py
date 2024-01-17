@@ -35,24 +35,24 @@ def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
     ----------
         M_mat : ArrayLike
             Square matrix
-        
+
         Minv_mat : ArrayLike or None, default=None
-            Square matrix, the inverse of M_mat. If not specified, this function will 
+            Square matrix, the inverse of M_mat. If not specified, this function will
             numerically evaluate the inverse of `M_mat`
 
         inplace : bool, default=False
-                Control whether or not the generated functions modify the input tensor
-                in-place, or return a copy with the m-transform applied
+            Control whether or not the generated functions modify the input tensor
+            in-place, or return a copy with the m-transform applied
 
     Returns
     -------
         M : Callable[[ArrayLike], ndarray]
-                A function which expects an order-3 tensor as input, and applies `M_mat` 
-                to each of the tubal fibres. This preserves the dimensions of the tensor.
+            A function which expects an order-3 tensor as input, and applies `M_mat`
+            to each of the tubal fibres. This preserves the dimensions of the tensor.
 
         Minv : Callable[[ArrayLike], ndarray]
             A tensor transform (the inverse of `M`)
-    
+
     References
     ----------
     `Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor
@@ -75,6 +75,10 @@ def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
             raise ValueError(
                 "Input matrix must be invertible, but appears singular, or close to singular"
             )
+    else:
+        assert (
+            Minv_mat.shape == M_mat.shape
+        ), "Ensure the shapes of matrix M and its inverse are the same"
 
     # a quick way of applying M along the tubal fibres of X, using np broadcasting:
     # transpose X into a n x t x p vertical stack of t x p matrices. matrix

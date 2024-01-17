@@ -28,7 +28,7 @@ def facewise_product(A, B):
 
 
 def m_product(A, B, M, Minv):
-    """Kilmer et al. (2021) tensor m-product for order-3 tensors. 
+    """Kilmer et al. (2021) tensor m-product for order-3 tensors.
 
     Parameters
     ----------
@@ -64,16 +64,16 @@ def m_product(A, B, M, Minv):
 
 
 def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
-    """In-place explicit rank-q truncation as introduced in Mor et al. (2022). Truncates 
-    tensors U, S, V from a tsvdm decomposition to achieve an explicit rank of q. 
+    """In-place explicit rank-q truncation as introduced in Mor et al. (2022). Truncates
+    tensors U, S, V from a tsvdm decomposition to achieve an explicit rank of q.
 
     Parameters
     ----------
         hatU : ndarray, shape (n, k, t)
-            Tensor U from the tsvdm. 
+            Tensor U from the tsvdm.
 
         hatS : ndarray, shape (k, k, t) or (k, t)
-            Tensor S from the tsvdm, or represented in compact matrix form. 
+            Tensor S from the tsvdm, or represented in compact matrix form.
 
         hatV : ndarray, shape (p, k, t)
             Tensor V from the tSVDM
@@ -83,16 +83,16 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
 
         sigma_q : float or None, default=None
             The `q`-th largest singular value. This will not be checked, and assumed to
-            be a valid singular value in the inputted decomposition. 
+            be a valid singular value in the inputted decomposition.
 
             If `sigma_q` is set, then the `q` input parameter will be ignored. Saves
-            re-computation of the `q`-th largest singular value. 
+            re-computation of the `q`-th largest singular value.
 
     Returns
     -------
         rho : ndarray, shape (q,)
             The multi-rank which results from the choice of `q` (or `sigma_q`)
-            
+
     References
     ----------
     Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron,
