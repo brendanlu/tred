@@ -45,8 +45,10 @@ def test_generate_transform_pair_from_matrix_for_tensor_target(shape):
         hatX_expected = np.zeros(shape=(k, t))
         for i in range(k):
             hatX_expected[i, :] = M_mat @ X[i, :]
-    else:  # len(X.shape) == 1
+    elif len(X.shape) == 1:
         hatX_expected = M_mat @ X
+    else:
+        raise RuntimeError("Unexpected shape passed in testing module")
 
     # compare with our optimized implementation
     M, Minv = generate_transform_pair_from_matrix(M_mat)
@@ -63,14 +65,27 @@ def test_scipy_fft_wrapper_transforms(shape, transform_generator):
     C = 5
 
     rng = np.random.default_rng(seed=GLOBAL_SEED)
-    t = shape[-1]
 
-    # arrays of various sizes with uniformly distributed elements within [-0.5*C, 0.5*C)
+    # tensors of various sizes with uniformly distributed elements within [-0.5*C, 0.5*C)
     X = rng.random(size=shape) * C - 0.5 * C
-    M, Minv = transform_generator(t)
+    M, Minv = transform_generator(shape[-1])
 
-    # ensure transform does not change shape
-    assert M(X).shape == X.shape
+    if len(X.shape) == 3:
+        n, p, t = shape
+        # apply across tensor tubes
+        hatX_expected = np.zeros(shape=(n, p, t))
+        for i in range(n):
+            for j in range(p):
+                hatX_expected[i, j:] = M(X[i, j, :])
+    elif len(X.shape) == 2:
+        k, t = shape
+        hatX_expected = np.zeros(shape=(k, t))
+        for i in range(k):
+            hatX_expected[i, :] = M(X[i, :])
+    else:
+        raise RuntimeError("Unexpected shape passed in testing module")
+
+    assert_allclose(hatX_expected, M(X))
 
     # test inverse transform working as expected
     assert_allclose(X, Minv(M(X)))
