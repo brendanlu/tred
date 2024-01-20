@@ -24,10 +24,10 @@ def test_facewise_product(tensor_shape, include_negatives, rectangular_offset):
     n, p, t = tensor_shape
 
     # generate some compatibly sized tensors
-    A = rng.random(size=((n, p, t))) * C1 - include_negatives * 0.5 * C1
+    A = rng.random(size=(n, p, t)) * C1 - include_negatives * 0.5 * C1
 
     B = (
-        rng.random(size=((p, n + rectangular_offset, t))) * C2
+        rng.random(size=(p, n + rectangular_offset, t)) * C2
         - include_negatives * 0.5 * C2
     )
 

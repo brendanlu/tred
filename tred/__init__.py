@@ -16,6 +16,7 @@ from ._utils import display_tensor_facewise
 # private - for testing
 ##########################################################################################
 from ._tensor_ops import _mode_1_unfold, _mode_2_unfold, _mode_3_unfold
+from ._utils import _singular_vals_tensor_to_mat, _singular_vals_mat_to_tensor
 
 __all__ = [
     "generate_transform_pair_from_matrix",
