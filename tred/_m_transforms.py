@@ -15,7 +15,7 @@ from scipy.fft import dct, idct, dst, idst
 # we do not need extensive parameter validation however, as the M and Minv Callables
 # returned by the generator functions are meant to be passed into classes and functions
 # in the tred package - which do some of their own parameter validation
-SUPPORTED_TRANSFORM_ORDERS = (2, 3)
+SUPPORTED_TRANSFORM_ORDERS = (1, 2, 3)
 
 
 def _assert_t_and_order(X_input, t_expected):
@@ -43,6 +43,9 @@ def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
         inplace : bool, default=False
             Control whether or not the generated functions modify the input tensor
             in-place, or return a copy with the m-transform applied
+
+            THIS ARGUMENT DOES NOT CURRENTLY ALTER ANY BEHAVIOUR FOR THIS FUNCTION, BUT
+            IS A PLACEHOLDER FOR FUTURE DEVELOPMENT.
 
     Returns
     -------
@@ -87,17 +90,21 @@ def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
     # tubal fibres. then transpose back to original
     def M(X):
         _assert_t_and_order(X, t_)
-        if len(X.shape) == 2:
-            return (M_mat @ X.T).T
-        else:  # len(X.shape == 3)
+        if len(X.shape) == 3:
             return (M_mat @ X.transpose(0, 2, 1)).transpose(0, 2, 1)
+        elif len(X.shape) == 2:
+            return (M_mat @ X.T).T
+        else:  # len(X.shape == 1)
+            return M_mat @ X
 
     def Minv(X):
         _assert_t_and_order(X, t_)
-        if len(X.shape) == 2:
-            return (Minv_mat @ X.T).T
-        else:  # len(X.shape == 3)
+        if len(X.shape) == 3:
             return (Minv_mat @ X.transpose(0, 2, 1)).transpose(0, 2, 1)
+        elif len(X.shape) == 2:
+            return (Minv_mat @ X.T).T
+        else:  # len(X.shape == 1)
+            return Minv_mat @ X
 
     return M, Minv
 
