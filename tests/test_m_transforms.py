@@ -22,7 +22,7 @@ SCIPY_GENERATORS = [
 
 
 @pytest.mark.parametrize("shape", TENSOR_SHAPES + MATRIX_SHAPES + VECTOR_SHAPES)
-def test_generate_transform_pair_from_matrix_for_tensor_target(shape):
+def test_matrix_defined_transforms(shape):
     """Compare implementation with (slower) mathematically clear version"""
     # scaling constant (arbitrary)
     C = 5
