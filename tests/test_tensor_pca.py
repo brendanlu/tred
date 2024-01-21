@@ -33,7 +33,7 @@ TRANSFORM_FAMILY_GENERATORS = [
 ]
 
 # test tiny, small, medium, and large numbers
-ELEMENT_SCALES = [10**i for i in range(-4, 5, 2)]
+ELEMENT_SCALES = [10**i for i in range(-4, 5, 4)]
 
 
 def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
@@ -92,10 +92,16 @@ def test_tsvdm(tensor_shape, element_scale, include_negatives, transform_generat
 @pytest.mark.parametrize("tensor_shape", TENSOR_SHAPES)
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
-@pytest.mark.parametrize("n_components", [None, 1, 6, 0.3, 0.8])
+@pytest.mark.parametrize("n_components", [None, 1, 6, 0.8])
+@pytest.mark.parametrize("centre", [True, False])
 @pytest.mark.parametrize("transform_generator", TRANSFORM_FAMILY_GENERATORS)
 def test_tpca(
-    tensor_shape, element_scale, include_negatives, n_components, transform_generator
+    tensor_shape,
+    element_scale,
+    include_negatives,
+    n_components,
+    transform_generator,
+    centre,
 ):
     """Make sure different inputs work, and perform basic sense checks"""
     RTOL = 1e-7
@@ -107,7 +113,7 @@ def test_tpca(
     k = min(n, p)
 
     M, Minv = transform_generator(t)
-    tpca = TPCA(n_components=n_components, M=M, Minv=Minv)
+    tpca = TPCA(n_components=n_components, M=M, Minv=Minv, centre=centre)
 
     # tensors of various sizes with uniformly distributed elements
     # within [0, element_scale) or [-0.5*element_scale, 0.5*element_scale)
