@@ -3,15 +3,28 @@ from functools import reduce
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
+from scipy.stats import special_ortho_group
 
 from tred import (
     generate_default_m_transform_pair,
     TPCA,
     tsvdm,
     m_product,
+    generate_transform_pair_from_matrix,
     generate_dctii_m_transform_pair,
     generate_dstii_m_transform_pair,
 )
+
+
+GLOBAL_SEED = 1
+RNG = np.random.default_rng(seed=GLOBAL_SEED)
+
+
+def _dummy_random_orthogonal_m_transform_generator(t):
+    """Let's test a m-transform defined by a random orthogonal matrix too!"""
+    M_mat = special_ortho_group.rvs(t, random_state=RNG)
+    M, Minv = generate_transform_pair_from_matrix(M_mat)
+    return M, Minv
 
 
 def _dummy_default_transform_generator(t):
@@ -19,14 +32,13 @@ def _dummy_default_transform_generator(t):
     return None, None
 
 
-GLOBAL_SEED = 1
-
 # various n, p, t sizes
 # ensure n > p, p > n inputs are tested
 TENSOR_SHAPES = [(4, 3, 2), (5, 7, 6), (2, 2, 6)]
 
 # m transforms to suit the tensor sizes above
 TRANSFORM_FAMILY_GENERATORS = [
+    _dummy_random_orthogonal_m_transform_generator,
     _dummy_default_transform_generator,
     generate_dctii_m_transform_pair,
     generate_dstii_m_transform_pair,
