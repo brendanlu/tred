@@ -126,10 +126,9 @@ def tsvdm(
     # transform the tensor to new space via the mode-3 product
     hatA = M(A)
 
-    # an appropriate transposition allows Numpys array broadcasting to work appropriately
-    # S_mat contains the singular values per matrix in the input matrix 'stack'
-    # we reshape into a sparse tensor
-    # (the transpose tensor stacks top to bottom, with t horizontal slices of size n by p)
+    # an appropriate transposition allows Numpys array broadcasting to do facewise svd's
+    # S_mat contains the singular values per matrix in the input stack of matrices
+    # (the transpose tensor stacks top to bottom, with t slices of size n by p)
     U_stack, S_mat, Vt_stack = np.linalg.svd(
         hatA.transpose(2, 0, 1), full_matrices=full_frontal_slices
     )
@@ -140,6 +139,17 @@ def tsvdm(
     # defined by .transpose(1, 0, 2)
     hatV = Vt_stack.transpose(2, 1, 0)
 
+    # if we are transforming scipy's singular values matrix back into tensor form, make
+    # sure we use the correct dimensions corresponding to whether or not the tensor
+    # faces were truncated during svd
+    if not svals_matrix_form:
+        if full_frontal_slices:
+            desired_S_tens_shape = A.shape
+        else:
+            n, p, t = A.shape
+            k = min(n, p)
+            desired_S_tens_shape = (k, k, t)
+
     if keep_hats:
         return (
             hatU,
@@ -147,7 +157,7 @@ def tsvdm(
             # (or) convert into compressed matrix of singular values of shape (k,t)
             S_mat
             if svals_matrix_form
-            else _singular_vals_mat_to_tensor(S_mat, *A.shape),
+            else _singular_vals_mat_to_tensor(S_mat, *desired_S_tens_shape),
             hatV,
         )
     else:
@@ -157,7 +167,7 @@ def tsvdm(
             # (or) convert into compressed matrix of singular values of shape (k,t)
             Minv(S_mat)
             if svals_matrix_form
-            else _singular_vals_mat_to_tensor(Minv(S_mat), *A.shape),
+            else _singular_vals_mat_to_tensor(Minv(S_mat), *desired_S_tens_shape),
             Minv(hatV),
         )
 

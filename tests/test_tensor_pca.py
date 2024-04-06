@@ -74,7 +74,14 @@ def _check_fitted_tpca_close(tpca1, tpca2, rtol, atol):
 @pytest.mark.parametrize("element_scale", ELEMENT_SCALES)
 @pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("transform_generator", TRANSFORM_FAMILY_GENERATORS)
-def test_tsvdm(tensor_shape, element_scale, include_negatives, transform_generator):
+@pytest.mark.parametrize("return_full_frontal_slices", [True, False])
+def test_tsvdm(
+    tensor_shape,
+    element_scale,
+    include_negatives,
+    transform_generator,
+    return_full_frontal_slices,
+):
     rng = np.random.default_rng(seed=GLOBAL_SEED)
     n, p, t = tensor_shape
 
@@ -86,7 +93,7 @@ def test_tsvdm(tensor_shape, element_scale, include_negatives, transform_generat
     )
 
     M, Minv = transform_generator(t)
-    U, S, V = tsvdm(X, M=M, Minv=Minv)
+    U, S, V = tsvdm(X, M=M, Minv=Minv, full_frontal_slices=return_full_frontal_slices)
     Vt = V.transpose(1, 0, 2)
 
     # make sure that the m-product below has a 'non-None' set of inputs for M and Minv
