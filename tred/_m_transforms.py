@@ -8,20 +8,21 @@ from scipy.fft import dct, idct, dst, idst
 
 
 # the transform generator functions below all work for:
-#   1. order 3 tensors: by applying the transform along the tubal fibres
-#   2. matrices: by applying the transform along the rows
+#   1. 3D array (tensor): by applying the transform along the tubal fibres
+#   2. 2D array (matrices): by applying the transform along the rows
+#   3. 1D array (vector): by applying the transform on the vector
 # i.e., along the -1 axis of order-2 and order-3 arrays
 #
 # we do not need extensive parameter validation however, as the M and Minv Callables
 # returned by the generator functions are meant to be passed into classes and functions
 # in the tred package - which do some of their own parameter validation
-SUPPORTED_TRANSFORM_ORDERS = (1, 2, 3)
+SUPPORTED_TRANSFORM_DIMENSIONS = (1, 2, 3)
 
 
 def _assert_t_and_order(X_input, t_expected):
     assert (
-        len(X_input.shape) in SUPPORTED_TRANSFORM_ORDERS
-    ), "Expecting matrix or order-3 tensor input"
+        len(X_input.shape) in SUPPORTED_TRANSFORM_DIMENSIONS
+    ), "Expecting 1D (vector), 2D (matrix) or 3D (tensor) input"
     assert (
         X_input.shape[-1] == t_expected
     ), f"Expecting last input dimension to be {t_expected}"

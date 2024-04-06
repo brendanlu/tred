@@ -24,7 +24,9 @@ def display_tensor_facewise(tens):
     """By default Numpy prints order-3 arrays as vertical stacks of order-2 arrays, in
     line with their broadcasting rules. This function prints a transpose view so the
     print output is a more intuitive sequence of frontal slices. We often use this in
-    notebooks.
+    notebooks. It also prints the rounded values.
+
+    UPDATE: Also works for matrices and vectors now.
 
     Parameters
     ----------
@@ -52,9 +54,21 @@ def display_tensor_facewise(tens):
     [0. 1. 0.]
     [0. 0. 1.]]]
     """
-    assert len(tens.shape) == 3, "expecting tensor (order-3) array input!"
-    print(f"Tensor with dimensions {tens.shape}")
-    print(tens.transpose(2, 0, 1))
+    assert len(tens.shape) in (
+        1,  # vector
+        2,  # matrix
+        3,  # tensor
+    ), "Expecting 1D (vector), 2D (matrix) or 3D (tensor) input"
+
+    if len(tens.shape) == 3:
+        print(f"Tensor with shape {tens.shape}")
+        print(tens.transpose(2, 0, 1).round(6))
+    else:
+        if len(tens.shape) == 2:
+            print(f"Matrix with shape {tens.shape}")
+        else:
+            print(f"Vector with length {tens.shape}")
+        print(tens.round(5))
 
 
 def _singular_vals_mat_to_tensor(mat, n, p, t):
