@@ -1,30 +1,35 @@
 """Module with mathematical operations"""
 
 
+from functools import reduce
+
 import numpy as np
 
 from ._utils import _singular_vals_tensor_to_mat
 
 
-def facewise_product(A, B):
-    """Facewise product s.t. $(C_{:,:,i} = A_{:,:,i} B_{:,:,i}$.
+def facewise_product(*tensors):
+    """Compute cumulative facewise product s.t. $(C_{:,:,i} = A_{:,:,i} B_{:,:,i}$.
 
     Parameters
     ----------
-        A : ndarray, shape (a, b, d)
-            Tensor represented in order-3 ndarray
-
-        B : ndarray, shape (b, c, d)
-            Tensor represented in order-3 ndarray
+        *tensors : ndarray
+            Variable number of tensors, such that adjacent input tensors have
+            shape (a, b, d) and shape (b, c, d) respectively
 
     Returns
     -------
         C : ndarray, shape: (a, c, d)
             Facewise tensor product
     """
-    # return np.einsum('mpi,pli->mli', A, B)
+    # np.einsum('mpi,pli->mli', tens1, tens2)
     # the following is a quicker version of the above using numpy broadcasting
-    return (A.transpose(2, 0, 1) @ B.transpose(2, 0, 1)).transpose(1, 2, 0)
+    binary_facewise = lambda tens1, tens2: (
+        tens1.transpose(2, 0, 1) @ tens2.transpose(2, 0, 1)
+    ).transpose(1, 2, 0)
+
+    # apply the lambda function cumulatively over the tensor inputs
+    return reduce(binary_facewise, tensors)
 
 
 def m_product(A, B, M, Minv):
