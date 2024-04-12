@@ -4,6 +4,8 @@ SVD. Most of the functionality in this module can be regarded as dimensionality 
 strategies for order-3 datasets of size n, p, t, where p >> n > t. 
 """
 
+__version__ = "0.1.1"
+
 from ._m_transforms import (
     generate_transform_pair_from_matrix,
     generate_dstii_m_transform_pair,
