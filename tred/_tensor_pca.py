@@ -18,41 +18,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._tensor_ops import facewise_product, _rank_q_truncation_zero_out
 from ._utils import RealNotInt, _singular_vals_mat_to_tensor
-from ._m_transforms import generate_dctii_m_transform_pair
-
-
-def generate_default_m_transform_pair(t):
-    """Wrapper for a function that generates functions M and Minv given the length of
-    a tubal fibre.
-
-    Both the tsvdm and TPCA do not require the user to explicitly specify a tensor
-    m-transform. In those cases, they rely on this function here.
-
-    We may choose to choose a different default family of mappings later.
-
-    Parameters
-    ----------
-        t : int
-            The length of the transform (length of the tubal fibers)
-
-    Returns
-    -------
-        M : Callable[[ArrayLike], ndarray]
-            A function which expects an order-3 tensor as input, and applies a tensor
-            transform to each of the tubal fibres. This preserves the dimensions of
-            the tensor.
-
-        Minv : Callable[[ArrayLike], ndarray]
-            A tensor transform (the inverse of `fun_m`)
-
-    References
-    ----------
-    The use of this transform with the m-product was introduced in:
-    `Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron,
-    H., 2022. Dimensionality reduction of longitudinal’omics data using modern
-    tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.`
-    """
-    return generate_dctii_m_transform_pair(t)
+from ._m_transforms import generate_default_m_transform_pair
 
 
 def tsvdm(

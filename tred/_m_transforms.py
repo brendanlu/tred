@@ -28,6 +28,42 @@ def _assert_t_and_order(X_input, t_expected):
     ), f"Expecting last input dimension to be {t_expected}"
 
 
+def generate_default_m_transform_pair(t):
+    """Wrapper for a function that generates functions M and Minv given the length of
+    a tubal fibre. Allows tred user to retrive the tubal transform functions for direct
+    computations using the tensor-tensor m-product.
+
+    The algorithms in the tred library do not require the user to explicitly specify a
+    tensor m-transform. In those cases, they revert to the default specified in this
+    function here.
+
+    We may choose to choose a different default family of mappings later.
+
+    Parameters
+    ----------
+        t : int
+            The length of the transform (length of the tubal fibers)
+
+    Returns
+    -------
+        M : Callable[[ArrayLike], ndarray]
+            A function which expects an order-3 tensor as input, and applies a tensor
+            transform to each of the tubal fibres. This preserves the dimensions of
+            the tensor.
+
+        Minv : Callable[[ArrayLike], ndarray]
+            A tensor transform (the inverse of `fun_m`)
+
+    References
+    ----------
+    The use of this transform with the m-product was introduced in:
+    `Mor, U., Cohen, Y., Valdés-Mas, R., Kviatcovsky, D., Elinav, E. and Avron,
+    H., 2022. Dimensionality reduction of longitudinal’omics data using modern
+    tensor factorizations. PLoS Computational Biology, 18(7), p.e1010212.`
+    """
+    return generate_dctii_m_transform_pair(t)
+
+
 def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
     """Generate a pair of functions to apply a matrix, and its inverse, to the tubal
     fibres of an order-3 tensor. See Kilmer et al. (20211).
