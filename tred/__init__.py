@@ -4,7 +4,7 @@ SVD. Most of the functionality in this module can be regarded as dimensionality 
 strategies for order-3 datasets of size n, p, t, where p >> n > t. 
 """
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 from ._m_transforms import (
     generate_default_m_transform_pair,
