@@ -5,7 +5,25 @@ from functools import reduce
 
 import numpy as np
 
+from ._m_transforms import generate_default_m_transform_pair
 from ._utils import _singular_vals_tensor_to_mat
+
+# np.einsum('mpi,pli->mli', tens1, tens2)
+# the following is a quicker version of the above using numpy broadcasting
+#
+# NOTE: we have defined an anonymous functions for a binary facewise operation between
+# two tensors defined by numpy ndarrays
+#
+# the facewise_product(*args) function works for any number of tensor inputs, and applies this
+# operation cumulatively over the inputs
+#
+# however, the m_product(*args) function directly calls this binary lambda operation
+# defined below, so that it can lazily reduce it over a python *generator*, thus saving
+# us from having to store all the input tensors in the 'hat-space' (see Mor et al. 2022)
+# in memory
+_BINARY_FACEWISE = lambda tens1, tens2: (
+    tens1.transpose(2, 0, 1) @ tens2.transpose(2, 0, 1)
+).transpose(1, 2, 0)
 
 
 def facewise_product(*tensors):
@@ -14,7 +32,7 @@ def facewise_product(*tensors):
     Parameters
     ----------
         *tensors : ndarray
-            Variable number of tensors, such that adjacent input tensors have
+            Variable number of tensors, such that all adjacent input tensors have
             shape (a, b, d) and shape (b, c, d) respectively
 
     Returns
@@ -22,32 +40,24 @@ def facewise_product(*tensors):
         C : ndarray, shape: (a, c, d)
             Facewise tensor product
     """
-    # np.einsum('mpi,pli->mli', tens1, tens2)
-    # the following is a quicker version of the above using numpy broadcasting
-    binary_facewise = lambda tens1, tens2: (
-        tens1.transpose(2, 0, 1) @ tens2.transpose(2, 0, 1)
-    ).transpose(1, 2, 0)
-
     # apply the lambda function cumulatively over the tensor inputs
-    return reduce(binary_facewise, tensors)
+    return reduce(_BINARY_FACEWISE, tensors)
 
 
-def m_product(A, B, M, Minv):
+def m_product(*tensors, **transforms):
     """Kilmer et al. (2021) tensor m-product for order-3 tensors.
 
     Parameters
     ----------
-        A : ndarray, shape (a, b, d)
-            Tensor represented in order-3 ndarray
+        *tensors : ndarray
+            Variable number of tensors, such that all adjacent input tensors have
+            shape (a, b, d) and shape (b, c, d) respectively
 
-        B : ndarray, shape (b, c, d)
-            Tensor represented in order-3 ndarray
-
-        M : Callable[[ArrayLike], ndarray]
+        M : Callable[[ArrayLike], ndarray] or None, default=None
             A function which, given some order-3 tensor, returns it under an orthogonal
             tubal transformation
 
-        MInv : Callable[[ArrayLike], ndarray]
+        MInv : Callable[[ArrayLike], ndarray] or None, default=None
             A function implementing the inverse tubal transformation of M
 
     Returns
@@ -61,11 +71,19 @@ def m_product(A, B, M, Minv):
     algebra for optimal representation and compression of multiway data. Proceedings
     of the National Academy of Sciences, 118(28), p.e2015851118.
     """
-    assert (
-        A.shape[1] == B.shape[0] and A.shape[2] == B.shape[2]
-    ), "Non conforming dimensions"
+    # process the m-transform keyword inputs, and use default transforms if unspecified
+    default_transforms = {"M": None, "Minv": None}
+    transforms = {**default_transforms, **transforms}
+    assert not (
+        callable(transforms["M"]) ^ callable(transforms["Minv"])
+    ), "If explicitly defined, both M and its inverse must be defined"
 
-    return Minv(facewise_product(M(A), M(B)))
+    if transforms["M"] is None:
+        M, Minv = generate_default_m_transform_pair(tensors[0].shape[-1])
+    else:
+        M, Minv = transforms["M"], transforms["Minv"]
+
+    return Minv(reduce(_BINARY_FACEWISE, (M(tens) for tens in tensors)))
 
 
 def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
