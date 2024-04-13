@@ -78,7 +78,10 @@ def m_product(*tensors, **transforms):
         callable(transforms["M"]) ^ callable(transforms["Minv"])
     ), "If explicitly defined, both M and its inverse must be defined"
 
-    if transforms["M"] is None:
+    # use user specified transforms if valid, otherwise use defaults
+    if not callable(
+        transforms["M"]
+    ):  # and Minv is not defined - guaranteed by assertion
         M, Minv = generate_default_m_transform_pair(tensors[0].shape[-1])
     else:
         M, Minv = transforms["M"], transforms["Minv"]

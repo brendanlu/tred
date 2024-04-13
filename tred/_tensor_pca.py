@@ -86,7 +86,7 @@ def tsvdm(
         callable(M) ^ callable(Minv)
     ), "If explicitly defined, both M and its inverse must be defined"
 
-    if M is None:  # and Minv is None - guaranteed by assertion
+    if not callable(M):  # and Minv is not defined - guaranteed by assertion
         M, Minv = generate_default_m_transform_pair(A.shape[-1])
 
     # transform the tensor to new space via the mode-3 product
@@ -367,7 +367,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
 
         # if there is no explicitly defined transform in __init__, assign functions to
         # perform a default transformation
-        if self.M is None:  # and Minv is None - guaranteed by assertion
+        if not callable(self.M):  # and Minv is not defined - guaranteed by assertion
             self.M_, self.Minv_ = generate_default_m_transform_pair(X.shape[2])
         else:
             self.M_, self.Minv_ = self.M, self.Minv
