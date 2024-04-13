@@ -83,6 +83,13 @@ def m_product(*tensors, **transforms):
     else:
         M, Minv = transforms["M"], transforms["Minv"]
 
+    # use a generator representing all the tensors under the m-transform ('hat space'),
+    # and apply the binary facewise function over the generator; it will only lazily
+    # evaluate the generator so we do not have to store all the transformed tensors in
+    # memory at once
+    #
+    # then apply Minv at the end to get back into the 'original' (untransformed) tensor
+    # space
     return Minv(reduce(_BINARY_FACEWISE, (M(tens) for tens in tensors)))
 
 
