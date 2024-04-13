@@ -40,14 +40,14 @@ def tsvdm(
 
     Parameters
     ----------
-        A : ArrayLike, shape: (n, p, t)
+        A : ndarray, shape: (n, p, t)
             $n \times p \times t$ data tensor
 
-        M : Callable[[ArrayLike], ndarray] or None, default=None
+        M : Callable[[ndarray], ndarray] or None, default=None
             A function which, given some order-3 tensor, returns it under some $\times_3$
             invertible transformation.
 
-        MInv : Callable[[ArrayLike], ndarray] or None, default=None
+        MInv : Callable[[ndarray], ndarray] or None, default=None
             The inverse transformation of M
 
         keep_hats : bool, default=False
@@ -165,12 +165,12 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         If False, data passed to fit are overwritten and running fit(X).transform(X) will
         not yield the expected results. Use fit_transform(X) instead.
 
-    M : Callable[[ArrayLike], ndarray] or None, default=None
+    M : Callable[[ndarray], ndarray] or None, default=None
         A function which, given some order-3 tensor, returns it under some $\times_3$
         invertible transformation. If unspecified TPCA will use the Discrete Consine
         Transform (ii) from scipy fft.
 
-    MInv : Callable[[ArrayLike], ndarray] or None, default=None
+    MInv : Callable[[ndarray], ndarray] or None, default=None
         The inverse transformation of M.
 
     centre : bool, default=True
@@ -183,7 +183,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
     n_, p_, t_, k_ : int
         The dimensions of the training data. ``k_ == min(n_, p_)``
 
-    M_, MInv_ : Callable[[ArrayLike], ndarray]
+    M_, MInv_ : Callable[[ndarray], ndarray]
         The m-transform pair (forward and inverse) used for the underlying tensor-tensor
         m-product.
 
@@ -246,7 +246,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
 
         Parameters
         ----------
-        X : ArrayLike of shape (n, p, t)
+        X : ndarray of shape (n, p, t)
             Training data, where `n` is the number of samples, `p` is the number of
             features, as `t` is the number of time points.
 
@@ -268,7 +268,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
 
         Parameters
         ----------
-        X : ArrayLike of shape (n, p, t)
+        X : ndarray of shape (n, p, t)
             Training data, where `n` is the number of samples, `p` is the number of
             features, as `t` is the number of time points.
 
@@ -306,7 +306,7 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
 
         Parameters
         ----------
-        X : ArrayLike of shape (n, p, t)
+        X : ndarray of shape (n, p, t)
             Training data, where `n` is the number of samples, `p` is the number of
             features, as `t` is the number of time points.
 

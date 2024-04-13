@@ -30,7 +30,7 @@ def display_tensor_facewise(tens):
 
     Parameters
     ----------
-        tens : ArrayLike of shape (n, p, t)
+        tens : ndarray of shape (n, p, t)
             Order-3 tensor representation
 
     Examples
@@ -79,7 +79,7 @@ def _singular_vals_mat_to_tensor(mat, n, p, t):
 
     Parameters
     ----------
-        mat : ArrayLike of shape (k, t_)
+        mat : ndarray of shape (k, t_)
             $k \times t_$ matrix representation, the function checks if `t_ == t`
 
         n : int
@@ -115,7 +115,7 @@ def _singular_vals_tensor_to_mat(tensor):
 
     Parameters
     ----------
-        tensor : ArrayLike of shape: (n, p, t)
+        tensor : ndarray of shape: (n, p, t)
             $n \times p \times t$ tensor representation
 
     Returns

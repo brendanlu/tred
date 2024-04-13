@@ -53,11 +53,11 @@ def m_product(*tensors, **transforms):
             Variable number of tensors, such that all adjacent input tensors have
             shape (a, b, d) and shape (b, c, d) respectively
 
-        M : Callable[[ArrayLike], ndarray] or None, default=None
+        M : Callable[[ndarray], ndarray] or None, default=None
             A function which, given some order-3 tensor, returns it under an orthogonal
             tubal transformation
 
-        MInv : Callable[[ArrayLike], ndarray] or None, default=None
+        MInv : Callable[[ndarray], ndarray] or None, default=None
             A function implementing the inverse tubal transformation of M
 
     Returns

@@ -46,12 +46,12 @@ def generate_default_m_transform_pair(t):
 
     Returns
     -------
-        M : Callable[[ArrayLike], ndarray]
+        M : Callable[[ndarray], ndarray]
             A function which expects an order-3 tensor as input, and applies a tensor
             transform to each of the tubal fibres. This preserves the dimensions of
             the tensor.
 
-        Minv : Callable[[ArrayLike], ndarray]
+        Minv : Callable[[ndarray], ndarray]
             A tensor transform (the inverse of `fun_m`)
 
     References
@@ -70,10 +70,10 @@ def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
 
     Parameters
     ----------
-        M_mat : ArrayLike
+        M_mat : ndarray
             Square matrix
 
-        Minv_mat : ArrayLike or None, default=None
+        Minv_mat : ndarray or None, default=None
             Square matrix, the inverse of M_mat. If not specified, this function will
             numerically evaluate the inverse of `M_mat`
 
@@ -86,11 +86,11 @@ def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
 
     Returns
     -------
-        M : Callable[[ArrayLike], ndarray]
+        M : Callable[[ndarray], ndarray]
             A function which expects an order-3 tensor as input, and applies `M_mat`
             to each of the tubal fibres. This preserves the dimensions of the tensor.
 
-        Minv : Callable[[ArrayLike], ndarray]
+        Minv : Callable[[ndarray], ndarray]
             A tensor transform (the inverse of `M`)
 
     References
@@ -164,11 +164,11 @@ def generate_dctii_m_transform_pair(t, *, inplace=False, norm="ortho"):
 
     Returns
     -------
-        M : Callable[[ArrayLike], ndarray]
+        M : Callable[[ndarray], ndarray]
             A function which expects an order-3 tensor as input, and applies DCT-II to
             each of the tubal fibres. This preserves the dimensions of the tensor.
 
-        Minv : Callable[[ArrayLike], ndarray]
+        Minv : Callable[[ndarray], ndarray]
             A tensor transform (the inverse of `M`)
 
     References
@@ -224,12 +224,12 @@ def generate_dstii_m_transform_pair(t, *, inplace=False, norm="ortho"):
 
     Returns
     -------
-        M : Callable[[ArrayLike], ndarray]
+        M : Callable[[ndarray], ndarray]
             A function which expects an order-3 tensor as input, and applies DFT via a FFT
             algorithm to each of the tubal fibres. This preserves the dimensions of the
             tensor.
 
-        Minv : Callable[[ArrayLike], ndarray]
+        Minv : Callable[[ndarray], ndarray]
             A tensor transform (the inverse of `M`)
     """
 
