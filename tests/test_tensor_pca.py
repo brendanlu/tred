@@ -113,15 +113,7 @@ def test_tsvdm(
     U, S, V = tsvdm(X, M=M, Minv=Minv, full_frontal_slices=return_full_frontal_slices)
     Vt = V.transpose(1, 0, 2)
 
-    # make sure that the m-product below has a 'non-None' set of inputs for M and Minv
-    if M is None:
-        M, Minv = generate_default_m_transform_pair(t)
-
-    def m_product_wrapper(A, B):
-        """m-product with fixed M and Minv to use for functools reduce"""
-        return m_product(A, B, M=M, Minv=Minv)
-
-    X_reconstruct = reduce(m_product_wrapper, (U, S, Vt))
+    X_reconstruct = m_product(U, S, Vt, M=M, Minv=Minv)
     assert_allclose(X, X_reconstruct)
 
 
