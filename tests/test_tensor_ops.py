@@ -12,24 +12,20 @@ TENSOR_SHAPES = [(4, 3, 2), (5, 7, 6), (2, 2, 6)]
 
 
 @pytest.mark.parametrize("tensor_shape", TENSOR_SHAPES)
-@pytest.mark.parametrize("include_negatives", [0, 1])
 @pytest.mark.parametrize("rectangular_offset", [0, 5])
-def test_facewise_product(tensor_shape, include_negatives, rectangular_offset):
+def test_facewise_product(tensor_shape, rectangular_offset):
     """Compare with mathematically clearer (but less efficient) implementations"""
     # scaling constants (arbitrary)
-    C1 = 5
-    C2 = 6
+    SCALE1 = 5
+    SCALE2 = 6
 
     rng = np.random.default_rng(seed=GLOBAL_SEED)
     n, p, t = tensor_shape
 
     # generate some compatibly sized tensors
-    A = rng.random(size=(n, p, t)) * C1 - include_negatives * 0.5 * C1
+    A = rng.random(size=(n, p, t)) * SCALE1 - 0.5 * SCALE1
 
-    B = (
-        rng.random(size=(p, n + rectangular_offset, t)) * C2
-        - include_negatives * 0.5 * C2
-    )
+    B = rng.random(size=(p, n + rectangular_offset, t)) * SCALE2 - 0.5 * SCALE2
 
     # compute expected results using naive implementations
     fp_expected = np.zeros(shape=(n, n + rectangular_offset, t))
@@ -37,6 +33,18 @@ def test_facewise_product(tensor_shape, include_negatives, rectangular_offset):
         fp_expected[:, :, i] = A[:, :, i] @ B[:, :, i]
 
     assert_allclose(fp_expected, facewise_product(A, B))
+
+    C = (
+        rng.random(size=(n + rectangular_offset, n + rectangular_offset, t)) * SCALE2
+        - 0.5 * SCALE2
+    )
+
+    # test facewise product with multiple tensor inputs as well
+    fp_expected_cumulative = np.zeros(shape=(n, n + rectangular_offset, t))
+    for i in range(t):
+        fp_expected_cumulative[:, :, i] = fp_expected[:, :, i] @ C[:, :, i]
+
+    assert_allclose(fp_expected_cumulative, facewise_product(A, B, C))
 
 
 @pytest.mark.parametrize("view", [True, False])
