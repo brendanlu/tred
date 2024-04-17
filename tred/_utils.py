@@ -68,7 +68,7 @@ def display_tensor_facewise(tens):
             print(f"Matrix with shape {tens.shape}")
         else:
             print(f"Vector with length {tens.shape}")
-        print(tens.round(5))
+        print(tens.round(6))
 
 
 def _singular_vals_mat_to_tensor(mat, n, p, t):
