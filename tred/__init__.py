@@ -12,8 +12,8 @@ from ._m_transforms import (
     generate_dstii_m_transform_pair,
     generate_dctii_m_transform_pair,
 )
-from ._tensor_ops import facewise_product, m_product
-from ._tensor_pca import tsvdm, TPCA
+from ._tensor_ops import facewise_product, m_product, tsvdm
+from ._tensor_pca import TPCA
 from ._utils import display_tensor_facewise
 
 # private - for testing

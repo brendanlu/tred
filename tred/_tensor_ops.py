@@ -6,7 +6,7 @@ from functools import reduce
 import numpy as np
 
 from ._m_transforms import generate_default_m_transform_pair
-from ._utils import _singular_vals_tensor_to_mat
+from ._utils import _singular_vals_tensor_to_mat, _singular_vals_mat_to_tensor
 
 # np.einsum('mpi,pli->mli', tens1, tens2)
 # the following is a quicker version of the above using numpy broadcasting
@@ -94,6 +94,123 @@ def m_product(*tensors, **transforms):
     # then apply Minv at the end to get back into the 'original' (untransformed) tensor
     # space
     return Minv(reduce(_BINARY_FACEWISE, (M(tens) for tens in tensors)))
+
+
+def tsvdm(
+    A,
+    M=None,
+    Minv=None,
+    *,
+    keep_hats=False,
+    full_frontal_slices=True,
+    svals_matrix_form=False,
+):
+    """Return the t-SVDM decomposition from Kilmer et al. (2021). Currently, this is
+    a modified version of the implementation at https://github.com/UriaMorP/mprod_package
+    but we plan to update this in future, potentially adopting the TensorFlow framework,
+    or adopt other matrix svd implementations.
+
+    NOTE: For now, unlike some other implementations (Numpy, Scipy), we will return the
+    tensor $V$ NOT $V^T$.
+
+    Parameters
+    ----------
+        A : ndarray, shape: (n, p, t)
+            $n \times p \times t$ data tensor
+
+        M : Callable[[ndarray], ndarray] or None, default=None
+            A function which, given some order-3 tensor, returns it under some $\times_3$
+            invertible transformation.
+
+        MInv : Callable[[ndarray], ndarray] or None, default=None
+            The inverse transformation of M
+
+        keep_hats : bool, default=False
+            Setting to `True` will return the tSVDM factors in the tensor domain transform
+            space, under the specified $M$
+
+        full_frontal_slices : bool, default=True
+            In practice, one only needs the first $k$ columns of $U_{:,:,i}$, $V_{:,:,i}$.
+            Setting this to False will return tensors truncated, by removing columns after
+            the k-th one in U or V.
+            See: https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html
+
+        svals_matrix_form : bool, default=False
+            Setting to `True` will return a compressed version of $S$, whereby the
+            singular values of each f-diagonal frontal slice becomes the column of a
+            matrix, with t columns total
+
+    Returns
+    -------
+        U_tens : ndarray, shape: (n, n, t) if full_frontal_slices==True else (n, k, t)
+
+        S_tens : ndarray, shape: (n, p, t) if full_frontal_slices==True else (k, k, t)
+            if svals_matrix_form==False, S_mat of shape (k, t) returned instead
+
+        V_tens : ndarray, shape: (p, p, t) if full_frontal_slices==True else (p, k, t)
+
+    References
+    ----------
+    `Kilmer, M.E., Horesh, L., Avron, H. and Newman, E., 2021. Tensor-tensor
+    algebra for optimal representation and compression of multiway data. Proceedings
+    of the National Academy of Sciences, 118(28), p.e2015851118.`
+    """
+
+    assert len(A.shape) == 3, "Ensure order-3 tensor input"
+    assert not (
+        callable(M) ^ callable(Minv)
+    ), "If explicitly defined, both M and its inverse must be defined"
+
+    if not callable(M):  # and Minv is not defined - guaranteed by assertion
+        M, Minv = generate_default_m_transform_pair(A.shape[-1])
+
+    # transform the tensor to new space via the mode-3 product
+    hatA = M(A)
+
+    # an appropriate transposition allows Numpys array broadcasting to do facewise svd's
+    # S_mat contains the singular values per matrix in the input stack of matrices
+    # (the transpose tensor stacks top to bottom, with t slices of size n by p)
+    U_stack, S_mat, Vt_stack = np.linalg.svd(
+        hatA.transpose(2, 0, 1), full_matrices=full_frontal_slices
+    )
+
+    hatU = U_stack.transpose(1, 2, 0)
+    S_mat = S_mat.transpose()
+    # the following is a call to .transpose(1, 2, 0) followed by a facewise transpose
+    # defined by .transpose(1, 0, 2)
+    hatV = Vt_stack.transpose(2, 1, 0)
+
+    # if we are transforming scipy's singular values matrix back into tensor form, make
+    # sure we use the correct dimensions corresponding to whether or not the tensor
+    # faces were truncated during svd
+    if not svals_matrix_form:
+        if full_frontal_slices:
+            desired_S_tens_shape = A.shape
+        else:
+            n, p, t = A.shape
+            k = min(n, p)
+            desired_S_tens_shape = (k, k, t)
+
+    if keep_hats:
+        return (
+            hatU,
+            # by default return S as n,p,t f-diagonal tensor, matching literature
+            # (or) convert into compressed matrix of singular values of shape (k,t)
+            S_mat
+            if svals_matrix_form
+            else _singular_vals_mat_to_tensor(S_mat, *desired_S_tens_shape),
+            hatV,
+        )
+    else:
+        return (
+            Minv(hatU),
+            # by default return S as n,p,t f-diagonal tensor, matching literature
+            # (or) convert into compressed matrix of singular values of shape (k,t)
+            Minv(S_mat)
+            if svals_matrix_form
+            else _singular_vals_mat_to_tensor(Minv(S_mat), *desired_S_tens_shape),
+            Minv(hatV),
+        )
 
 
 def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
