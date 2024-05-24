@@ -14,8 +14,8 @@ from ._utils import _singular_vals_tensor_to_mat, _singular_vals_mat_to_tensor
 # NOTE: we have defined an anonymous functions for a binary facewise operation between
 # two tensors defined by numpy ndarrays
 #
-# the facewise_product(*args) function works for any number of tensor inputs, and applies this
-# operation cumulatively over the inputs
+# the facewise_product(*args) function works for any number of tensor inputs, and applies
+# this operation cumulatively over the inputs
 #
 # however, the m_product(*args) function directly calls this binary lambda operation
 # defined below, so that it can lazily reduce it over a python *generator*, thus saving
