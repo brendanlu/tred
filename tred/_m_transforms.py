@@ -41,18 +41,18 @@ def generate_default_m_transform_pair(t):
 
     Parameters
     ----------
-        t : int
-            The length of the transform (length of the tubal fibers)
+    t : int
+        The length of the transform (length of the tubal fibers)
 
     Returns
     -------
-        M : Callable[[ndarray], ndarray]
-            A function which expects an order-3 tensor as input, and applies a tensor
-            transform to each of the tubal fibres. This preserves the dimensions of
-            the tensor.
+    M : Callable[[ndarray], ndarray]
+        A function which expects an order-3 tensor as input, and applies a tensor
+        transform to each of the tubal fibres. This preserves the dimensions of
+        the tensor.
 
-        Minv : Callable[[ndarray], ndarray]
-            A tensor transform (the inverse of `fun_m`)
+    Minv : Callable[[ndarray], ndarray]
+        A tensor transform (the inverse of `fun_m`)
 
     References
     ----------
@@ -70,28 +70,28 @@ def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
 
     Parameters
     ----------
-        M_mat : ndarray
-            Square matrix
+    M_mat : ndarray
+        Square matrix
 
-        Minv_mat : ndarray or None, default=None
-            Square matrix, the inverse of M_mat. If not specified, this function will
-            numerically evaluate the inverse of `M_mat`
+    Minv_mat : ndarray or None, default=None
+        Square matrix, the inverse of M_mat. If not specified, this function will
+        numerically evaluate the inverse of `M_mat`
 
-        inplace : bool, default=False
-            Control whether or not the generated functions modify the input tensor
-            in-place, or return a copy with the m-transform applied
+    inplace : bool, default=False
+        Control whether or not the generated functions modify the input tensor
+        in-place, or return a copy with the m-transform applied
 
-            THIS ARGUMENT DOES NOT CURRENTLY ALTER ANY BEHAVIOUR FOR THIS FUNCTION, BUT
-            IS A PLACEHOLDER FOR FUTURE DEVELOPMENT.
+        THIS ARGUMENT DOES NOT CURRENTLY ALTER ANY BEHAVIOUR FOR THIS FUNCTION, BUT
+        IS A PLACEHOLDER FOR FUTURE DEVELOPMENT.
 
     Returns
     -------
-        M : Callable[[ndarray], ndarray]
-            A function which expects an order-3 tensor as input, and applies `M_mat`
-            to each of the tubal fibres. This preserves the dimensions of the tensor.
+    M : Callable[[ndarray], ndarray]
+        A function which expects an order-3 tensor as input, and applies `M_mat`
+        to each of the tubal fibres. This preserves the dimensions of the tensor.
 
-        Minv : Callable[[ndarray], ndarray]
-            A tensor transform (the inverse of `M`)
+    Minv : Callable[[ndarray], ndarray]
+        A tensor transform (the inverse of `M`)
 
     References
     ----------
@@ -152,24 +152,24 @@ def generate_dctii_m_transform_pair(t, *, inplace=False, norm="ortho"):
 
     Parameters
     ----------
-        t : int
-            The length of the transform
+    t : int
+        The length of the transform
 
-        inplace : bool, default=False
-            Control whether or not the generated functions modify the input tensor
-            in-place, or return a copy with the m-transform applied
+    inplace : bool, default=False
+        Control whether or not the generated functions modify the input tensor
+        in-place, or return a copy with the m-transform applied
 
-        norm : {“backward”, “ortho”, “forward”}, default="ortho"
-            See https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html#scipy.fft.dct
+    norm : {“backward”, “ortho”, “forward”}, default="ortho"
+        See https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dct.html#scipy.fft.dct
 
     Returns
     -------
-        M : Callable[[ndarray], ndarray]
-            A function which expects an order-3 tensor as input, and applies DCT-II to
-            each of the tubal fibres. This preserves the dimensions of the tensor.
+    M : Callable[[ndarray], ndarray]
+        A function which expects an order-3 tensor as input, and applies DCT-II to
+        each of the tubal fibres. This preserves the dimensions of the tensor.
 
-        Minv : Callable[[ndarray], ndarray]
-            A tensor transform (the inverse of `M`)
+    Minv : Callable[[ndarray], ndarray]
+        A tensor transform (the inverse of `M`)
 
     References
     ----------
@@ -212,25 +212,25 @@ def generate_dstii_m_transform_pair(t, *, inplace=False, norm="ortho"):
 
     Parameters
     ----------
-        t : int
-            The length of the transform
+    t : int
+        The length of the transform
 
-        inplace : bool, default=False
-            Control whether or not the generated functions modify the input tensor
-            in-place, or return a copy with the m-transform applied
+    inplace : bool, default=False
+        Control whether or not the generated functions modify the input tensor
+        in-place, or return a copy with the m-transform applied
 
-        norm : {“backward”, “ortho”, “forward”}, default="ortho"
-            See https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dst.html#scipy.fft.dst
+    norm : {“backward”, “ortho”, “forward”}, default="ortho"
+        See https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.dst.html#scipy.fft.dst
 
     Returns
     -------
-        M : Callable[[ndarray], ndarray]
-            A function which expects an order-3 tensor as input, and applies DFT via a FFT
-            algorithm to each of the tubal fibres. This preserves the dimensions of the
-            tensor.
+    M : Callable[[ndarray], ndarray]
+        A function which expects an order-3 tensor as input, and applies DFT via a FFT
+        algorithm to each of the tubal fibres. This preserves the dimensions of the
+        tensor.
 
-        Minv : Callable[[ndarray], ndarray]
-            A tensor transform (the inverse of `M`)
+    Minv : Callable[[ndarray], ndarray]
+        A tensor transform (the inverse of `M`)
     """
 
     def M(X):

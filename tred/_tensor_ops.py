@@ -31,14 +31,14 @@ def facewise_product(*tensors):
 
     Parameters
     ----------
-        *tensors : ndarray
-            Variable number of tensors, such that all adjacent input tensors have
-            shape (a, b, d) and shape (b, c, d) respectively
+    *tensors : ndarray
+        Variable number of tensors, such that all adjacent input tensors have
+        shape (a, b, d) and shape (b, c, d) respectively
 
     Returns
     -------
-        C : ndarray, shape: (a, c, d)
-            Facewise tensor product
+    C : ndarray, shape: (a, c, d)
+        Facewise tensor product
     """
     # apply the lambda function cumulatively over the tensor inputs
     return reduce(_BINARY_FACEWISE, tensors)
@@ -49,21 +49,21 @@ def m_product(*tensors, **transforms):
 
     Parameters
     ----------
-        *tensors : ndarray
-            Variable number of tensors, such that all adjacent input tensors have
-            shape (a, b, d) and shape (b, c, d) respectively
+    *tensors : ndarray
+        Variable number of tensors, such that all adjacent input tensors have
+        shape (a, b, d) and shape (b, c, d) respectively
 
-        M : Callable[[ndarray], ndarray] or None, default=None
-            A function which, given some order-3 tensor, returns it under an orthogonal
-            tubal transformation
+    M : Callable[[ndarray], ndarray] or None, default=None
+        A function which, given some order-3 tensor, returns it under an orthogonal
+        tubal transformation
 
-        MInv : Callable[[ndarray], ndarray] or None, default=None
-            A function implementing the inverse tubal transformation of M
+    MInv : Callable[[ndarray], ndarray] or None, default=None
+        A function implementing the inverse tubal transformation of M
 
     Returns
     -------
-        m_product : ndarray, shape: (a, c, d)
-            Tensor-tensor m-product as found in Kilmer et al. (2021)
+    m_product : ndarray, shape: (a, c, d)
+        Tensor-tensor m-product as found in Kilmer et al. (2021)
 
     References
     ----------
@@ -115,39 +115,39 @@ def tsvdm(
 
     Parameters
     ----------
-        A : ndarray, shape: (n, p, t)
-            $n \times p \times t$ data tensor
+    A : ndarray, shape: (n, p, t)
+        $n \times p \times t$ data tensor
 
-        M : Callable[[ndarray], ndarray] or None, default=None
-            A function which, given some order-3 tensor, returns it under some $\times_3$
-            invertible transformation.
+    M : Callable[[ndarray], ndarray] or None, default=None
+        A function which, given some order-3 tensor, returns it under some $\times_3$
+        invertible transformation.
 
-        MInv : Callable[[ndarray], ndarray] or None, default=None
-            The inverse transformation of M
+    MInv : Callable[[ndarray], ndarray] or None, default=None
+        The inverse transformation of M
 
-        keep_hats : bool, default=False
-            Setting to `True` will return the tSVDM factors in the tensor domain transform
-            space, under the specified $M$
+    keep_hats : bool, default=False
+        Setting to `True` will return the tSVDM factors in the tensor domain transform
+        space, under the specified $M$
 
-        full_frontal_slices : bool, default=True
-            In practice, one only needs the first $k$ columns of $U_{:,:,i}$, $V_{:,:,i}$.
-            Setting this to False will return tensors truncated, by removing columns after
-            the k-th one in U or V.
-            See: https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html
+    full_frontal_slices : bool, default=True
+        In practice, one only needs the first $k$ columns of $U_{:,:,i}$, $V_{:,:,i}$.
+        Setting this to False will return tensors truncated, by removing columns after
+        the k-th one in U or V.
+        See: https://numpy.org/doc/stable/reference/generated/numpy.linalg.svd.html
 
-        svals_matrix_form : bool, default=False
-            Setting to `True` will return a compressed version of $S$, whereby the
-            singular values of each f-diagonal frontal slice becomes the column of a
-            matrix, with t columns total
+    svals_matrix_form : bool, default=False
+        Setting to `True` will return a compressed version of $S$, whereby the
+        singular values of each f-diagonal frontal slice becomes the column of a
+        matrix, with t columns total
 
     Returns
     -------
-        U_tens : ndarray, shape: (n, n, t) if full_frontal_slices==True else (n, k, t)
+    U_tens : ndarray, shape: (n, n, t) if full_frontal_slices==True else (n, k, t)
 
-        S_tens : ndarray, shape: (n, p, t) if full_frontal_slices==True else (k, k, t)
-            if svals_matrix_form==False, S_mat of shape (k, t) returned instead
+    S_tens : ndarray, shape: (n, p, t) if full_frontal_slices==True else (k, k, t)
+        if svals_matrix_form==False, S_mat of shape (k, t) returned instead
 
-        V_tens : ndarray, shape: (p, p, t) if full_frontal_slices==True else (p, k, t)
+    V_tens : ndarray, shape: (p, p, t) if full_frontal_slices==True else (p, k, t)
 
     References
     ----------
@@ -219,29 +219,29 @@ def _rank_q_truncation_zero_out(hatU, hatS, hatV, *, q=None, sigma_q=None):
 
     Parameters
     ----------
-        hatU : ndarray, shape (n, k, t)
-            Tensor U from the tsvdm.
+    hatU : ndarray, shape (n, k, t)
+        Tensor U from the tsvdm.
 
-        hatS : ndarray, shape (k, k, t) or (k, t)
-            Tensor S from the tsvdm, or represented in compact matrix form.
+    hatS : ndarray, shape (k, k, t) or (k, t)
+        Tensor S from the tsvdm, or represented in compact matrix form.
 
-        hatV : ndarray, shape (p, k, t)
-            Tensor V from the tSVDM
+    hatV : ndarray, shape (p, k, t)
+        Tensor V from the tSVDM
 
-        q : int or None, default=None
-            Target explicit rank for the truncation
+    q : int or None, default=None
+        Target explicit rank for the truncation
 
-        sigma_q : float or None, default=None
-            The `q`-th largest singular value. This will not be checked, and assumed to
-            be a valid singular value in the inputted decomposition.
+    sigma_q : float or None, default=None
+        The `q`-th largest singular value. This will not be checked, and assumed to
+        be a valid singular value in the inputted decomposition.
 
-            If `sigma_q` is set, then the `q` input parameter will be ignored. Saves
-            re-computation of the `q`-th largest singular value.
+        If `sigma_q` is set, then the `q` input parameter will be ignored. Saves
+        re-computation of the `q`-th largest singular value.
 
     Returns
     -------
-        rho : ndarray, shape (q,)
-            The multi-rank which results from the choice of `q` (or `sigma_q`)
+    rho : ndarray, shape (q,)
+        The multi-rank which results from the choice of `q` (or `sigma_q`)
 
     References
     ----------

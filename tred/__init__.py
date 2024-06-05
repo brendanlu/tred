@@ -5,6 +5,7 @@ strategies for order-3 datasets of size n, p, t, where p >> n > t.
 """
 
 __version__ = "0.1.3"
+__docformat__ = "numpy"  # for pdoc
 
 from ._m_transforms import (
     generate_default_m_transform_pair,

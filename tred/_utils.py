@@ -30,8 +30,8 @@ def display_tensor_facewise(tens):
 
     Parameters
     ----------
-        tens : ndarray of shape (n, p, t)
-            Order-3 tensor representation
+    tens : ndarray of shape (n, p, t)
+        Order-3 tensor representation
 
     Examples
     --------
@@ -79,22 +79,22 @@ def _singular_vals_mat_to_tensor(mat, n, p, t):
 
     Parameters
     ----------
-        mat : ndarray of shape (k, t_)
-            $k \times t_$ matrix representation, the function checks if `t_ == t`
+    mat : ndarray of shape (k, t_)
+        $k \times t_$ matrix representation, the function checks if `t_ == t`
 
-        n : int
-            first dimension of output tensor
+    n : int
+        first dimension of output tensor
 
-        p : int
-            second dimension of output tensor
+    p : int
+        second dimension of output tensor
 
-        t : int
-            third dimensions of output tensor
+    t : int
+        third dimensions of output tensor
 
     Returns
     -------
-        hatS : ndarray of shape: (n, p, t)
-            $n \times p \times t$ tensor representation
+    hatS : ndarray of shape: (n, p, t)
+        $n \times p \times t$ tensor representation
     """
     k = min(n, p)
     assert k == mat.shape[0] and t == mat.shape[1], "Ensure conforming dimensions"
@@ -115,14 +115,14 @@ def _singular_vals_tensor_to_mat(tensor):
 
     Parameters
     ----------
-        tensor : ndarray of shape: (n, p, t)
-            $n \times p \times t$ tensor representation
+    tensor : ndarray of shape: (n, p, t)
+        $n \times p \times t$ tensor representation
 
     Returns
     -------
-        mat : ndarray of shape: (min(n, p), t)
-            $k \times t$ matrix representation of singular values, where
-            $k = \min{(n,p)}$
+    mat : ndarray of shape: (min(n, p), t)
+        $k \times t$ matrix representation of singular values, where
+        $k = \min{(n,p)}$
 
     Reference
     ---------
