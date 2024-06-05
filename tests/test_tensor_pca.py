@@ -50,7 +50,7 @@ def _dummy_random_orthogonal_m_transform_generator(t):
     return M, Minv
 
 
-def _dummy_default_transform_generator(t):
+def _dummy_test_none_m_transform(t):
     """Return M=None, Minv=None to test default m-transform configuration"""
     return None, None
 
@@ -59,7 +59,8 @@ def _dummy_default_transform_generator(t):
 # results when being used in tsvdm and TPCA
 TRANSFORM_FAMILY_GENERATORS = [
     _dummy_random_orthogonal_m_transform_generator,
-    _dummy_default_transform_generator,
+    _dummy_test_none_m_transform,
+    generate_default_m_transform_pair,
     generate_dctii_m_transform_pair,
     generate_dstii_m_transform_pair,
 ]
