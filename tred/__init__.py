@@ -1,11 +1,14 @@
 """
-The `tred` module implements tensor decomposition methods such as tensor PCA and tensor 
-SVD. Most of the functionality in this module can be regarded as dimensionality reduction 
-strategies for order-3 datasets of size n, p, t, where p >> n > t. 
+The `tred` module implements tensor decomposition methods such as tensor PCA 
+and tensor SVD. Most of the functionality in this module can be regarded as 
+dimensionality reduction strategies for order-3 datasets of shape n, p, t, 
+where p >> n > t. 
 """
 
+import inspect
+import sys
+
 __version__ = "0.1.3"
-__docformat__ = "numpy"  # for pdoc
 
 from ._m_transforms import (
     generate_default_m_transform_pair,
@@ -18,7 +21,7 @@ from ._tensor_pca import TPCA
 from ._utils import display_tensor_facewise
 
 # private - for testing
-##########################################################################################
+###############################################################################
 from ._tensor_ops import _mode_1_unfold, _mode_2_unfold, _mode_3_unfold
 from ._utils import _singular_vals_tensor_to_mat, _singular_vals_mat_to_tensor
 
@@ -32,4 +35,23 @@ __all__ = [
     "tsvdm",
     "TPCA",
     "display_tensor_facewise",
+    "datasets",
 ]
+
+
+# documentation configurations
+###############################################################################
+__docformat__ = "numpy"
+
+current_module = sys.modules[__name__]
+__pdoc__ = {}
+
+# iterate over classes in tred
+for name, obj in inspect.getmembers(current_module, inspect.isclass):
+    # find non-method attributes to exclude rendering into pdoc
+    exclude_attrs = [
+        attr for attr, member in inspect.getmembers(obj)
+        if not (inspect.isfunction(member) or inspect.ismethod(member))
+    ]
+    
+    __pdoc__.update({f'{name}.{attr}': False for attr in exclude_attrs})
