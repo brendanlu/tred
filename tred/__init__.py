@@ -8,7 +8,7 @@ where p >> n > t.
 import inspect
 import sys
 
-__version__ = "0.1.4"
+__version__ = "0.1.3"
 
 from ._m_transforms import (
     generate_default_m_transform_pair,
