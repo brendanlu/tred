@@ -8,7 +8,7 @@ where p >> n > t.
 import inspect
 import sys
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 from ._m_transforms import (
     generate_default_m_transform_pair,
@@ -50,8 +50,9 @@ __pdoc__ = {}
 for name, obj in inspect.getmembers(current_module, inspect.isclass):
     # find non-method attributes to exclude rendering into pdoc
     exclude_attrs = [
-        attr for attr, member in inspect.getmembers(obj)
+        attr
+        for attr, member in inspect.getmembers(obj)
         if not (inspect.isfunction(member) or inspect.ismethod(member))
     ]
-    
-    __pdoc__.update({f'{name}.{attr}': False for attr in exclude_attrs})
+
+    __pdoc__.update({f"{name}.{attr}": False for attr in exclude_attrs})
