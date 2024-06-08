@@ -42,10 +42,11 @@ def generate_default_m_transform_pair(t):
     Returns
     -------
     M : Callable[[ndarray], ndarray]
-        A function which expects a ndarray input, and returns the m-transform.
+        A function which expects an order-3 tensor as input, and returns the
+        image under the default m-transform being used in `tred`
 
     Minv : Callable[[ndarray], ndarray]
-        A function implementing the inverse transform of `M`
+        A function implementing the inverse transform of `M`.
 
     References
     ----------
@@ -89,7 +90,7 @@ def generate_transform_pair_from_matrix(M_mat, Minv_mat=None, *, inplace=False):
         the tensor.
 
     Minv : Callable[[ndarray], ndarray]
-        A function implementing the inverse transform of `M`
+        A function implementing the inverse transform of `M`.
 
     References
     ----------
@@ -174,7 +175,7 @@ def generate_dctii_m_transform_pair(t, *, inplace=False, norm="ortho"):
         dimensions of the tensor.
 
     Minv : Callable[[ndarray], ndarray]
-        A function implementing the inverse transform of `M`
+        A function implementing the inverse transform of `M`.
 
     References
     ----------
@@ -237,7 +238,7 @@ def generate_dstii_m_transform_pair(t, *, inplace=False, norm="ortho"):
         dimensions of the tensor.
 
     Minv : Callable[[ndarray], ndarray]
-        A function implementing the inverse transform of `M`
+        A function implementing the inverse transform of `M`.
     """
 
     def M(X):

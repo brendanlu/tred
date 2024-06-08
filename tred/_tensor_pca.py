@@ -53,12 +53,12 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
         `fit_transform(X)` instead.
 
     M : Callable[[ndarray], ndarray] or None, default=None
-        A function which, given some order-3 tensor, returns it under some
-        $\\times_3$ invertible transformation. If unspecified TPCA will use
-        the Discrete Consine Transform (ii) from scipy.fft.
+        A function which expects an order-3 tensor as input, and returns the
+        image under a m-transform. If unspecified TPCA will use the Discrete
+        Cosine Transform (ii) from `scipy.fft`.
 
-    MInv : Callable[[ndarray], ndarray] or None, default=None
-        The inverse transformation of M.
+    Minv : Callable[[ndarray], ndarray] or None, default=None
+        A function implementing the inverse transform of `M`.
 
     centre : bool, default=True
         If False, the data tensor will not be centralized into Mean Deviation
@@ -116,13 +116,21 @@ class TPCA(ClassNamePrefixFeaturesOutMixin, TransformerMixin, BaseEstimator):
     """
 
     def __init__(self, n_components=None, *, copy=True, M=None, Minv=None, centre=True):
+        """@private
+        Hacky way (for now) to suppress pdoc documentation being generated
+        for the instance variables and the constructor"""
         # as per sklearn conventions, we perform any and all parameter
         # validation inside fit, and none in __init__
         self.n_components = n_components
+        """@private"""
         self.copy = copy
+        """@private"""
         self.M = M
+        """@private"""
         self.Minv = Minv
+        """@private"""
         self.centre = centre
+        """@private"""
 
     def fit(self, X, y=None):
         """Fit the model with X.
