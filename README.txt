@@ -58,6 +58,13 @@ For anyone who is interested in contributing to / modifying the package:
             black . 
     In the root to autoformat code. 
 
+    To generate the docs, invoke:
+            pdoc --math tred -o ./docs 
+    To output the html into the docs folder
+    Or:
+            pdoc --math tred
+    To run a live version in your browser on your localhost. 
+
 Much of the implementation and code practice mirrors that of scikit-learn. We
 adopt their utilities and general coding guidelines whenever we can. 
 
