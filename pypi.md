@@ -10,3 +10,5 @@ a focus on efficient implementations using underlying NumPy algorithms.
 
 Contact brendannlu5@gmail.com if you are interested in using this for your 
 research, and want some support. 
+
+Read the docs here: [https://brendanlu.github.io/tred/tred.html](https://brendanlu.github.io/tred/tred.html)

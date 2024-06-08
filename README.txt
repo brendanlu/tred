@@ -17,6 +17,7 @@ For the explicit rank truncation, and the TCAM algorithm, see [2].
 Use
 ---
 See examples folder for basic use.
+See docs at: https://brendanlu.github.io/tred/tred.html
 
 tred is on PyPI, simply run
         pip install --upgrade tred
