@@ -39,7 +39,7 @@ def display_tensor_facewise(tens):
     Examples
     --------
     >>> import numpy as np
-    >>> from tdim import display_tensor_facewise as disp
+    >>> from tred import display_tensor_facewise as disp
     >>> test = np.eye(3)[:, :, None] # a 3x3x1 tensor
     >>> print(test) # Numpy ndarrays default __str__ method is not intuitive
     [[[1.]
