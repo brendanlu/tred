@@ -31,7 +31,7 @@ def facewise_product(*tensors):
 
     Returns
     -------
-    C : ndarray, shape: (a, c, d)
+    C : ndarray of shape (a, c, d)
         Facewise tensor product
     """
     # apply the lambda function cumulatively over the tensor inputs
@@ -58,7 +58,7 @@ def m_product(*tensors, **transforms):
 
     Returns
     -------
-    m_product : ndarray, shape: (a, c, d)
+    m_product : ndarray of shape (a, c, d)
         Tensor-tensor m-product as found in Kilmer et al. (2021)
 
     References
@@ -105,7 +105,7 @@ def tsvdm(
 
     Parameters
     ----------
-    A : ndarray, shape: (n, p, t)
+    A : ndarray of shape (n, p, t)
         Data tensor
 
     M : Callable[[ndarray], ndarray] or None, default=None
@@ -134,14 +134,14 @@ def tsvdm(
 
     Returns
     -------
-    U_tens : ndarray, shape: (n, n, t)
+    U_tens : ndarray of shape (n, n, t)
         If `full_frontal_slices==False` shape is (n, k, t) instead
 
-    S_tens : ndarray, shape: (n, p, t)
+    S_tens : ndarray of shape (n, p, t)
         If `full_frontal_slices==False` shape is (k, k, t) instead
         If `svals_matrix_form==True`, `S_mat` of shape (k, t) returned instead
 
-    V_tens : ndarray, shape: (p, p, t)
+    V_tens : ndarray of shape (p, p, t)
         If `full_frontal_slices==False` shape is (p, k, t) instead
 
     References

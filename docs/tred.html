@@ -192,7 +192,7 @@ where p &gt;&gt; n &gt; t.</p>
 </span><span id="tsvdm-106"><a href="#tsvdm-106"><span class="linenos">106</span></a>
 </span><span id="tsvdm-107"><a href="#tsvdm-107"><span class="linenos">107</span></a><span class="sd">    Parameters</span>
 </span><span id="tsvdm-108"><a href="#tsvdm-108"><span class="linenos">108</span></a><span class="sd">    ----------</span>
-</span><span id="tsvdm-109"><a href="#tsvdm-109"><span class="linenos">109</span></a><span class="sd">    A : ndarray, shape: (n, p, t)</span>
+</span><span id="tsvdm-109"><a href="#tsvdm-109"><span class="linenos">109</span></a><span class="sd">    A : ndarray of shape (n, p, t)</span>
 </span><span id="tsvdm-110"><a href="#tsvdm-110"><span class="linenos">110</span></a><span class="sd">        Data tensor</span>
 </span><span id="tsvdm-111"><a href="#tsvdm-111"><span class="linenos">111</span></a>
 </span><span id="tsvdm-112"><a href="#tsvdm-112"><span class="linenos">112</span></a><span class="sd">    M : Callable[[ndarray], ndarray] or None, default=None</span>
@@ -221,14 +221,14 @@ where p &gt;&gt; n &gt; t.</p>
 </span><span id="tsvdm-135"><a href="#tsvdm-135"><span class="linenos">135</span></a>
 </span><span id="tsvdm-136"><a href="#tsvdm-136"><span class="linenos">136</span></a><span class="sd">    Returns</span>
 </span><span id="tsvdm-137"><a href="#tsvdm-137"><span class="linenos">137</span></a><span class="sd">    -------</span>
-</span><span id="tsvdm-138"><a href="#tsvdm-138"><span class="linenos">138</span></a><span class="sd">    U_tens : ndarray, shape: (n, n, t)</span>
+</span><span id="tsvdm-138"><a href="#tsvdm-138"><span class="linenos">138</span></a><span class="sd">    U_tens : ndarray of shape (n, n, t)</span>
 </span><span id="tsvdm-139"><a href="#tsvdm-139"><span class="linenos">139</span></a><span class="sd">        If `full_frontal_slices==False` shape is (n, k, t) instead</span>
 </span><span id="tsvdm-140"><a href="#tsvdm-140"><span class="linenos">140</span></a>
-</span><span id="tsvdm-141"><a href="#tsvdm-141"><span class="linenos">141</span></a><span class="sd">    S_tens : ndarray, shape: (n, p, t)</span>
+</span><span id="tsvdm-141"><a href="#tsvdm-141"><span class="linenos">141</span></a><span class="sd">    S_tens : ndarray of shape (n, p, t)</span>
 </span><span id="tsvdm-142"><a href="#tsvdm-142"><span class="linenos">142</span></a><span class="sd">        If `full_frontal_slices==False` shape is (k, k, t) instead</span>
 </span><span id="tsvdm-143"><a href="#tsvdm-143"><span class="linenos">143</span></a><span class="sd">        If `svals_matrix_form==True`, `S_mat` of shape (k, t) returned instead</span>
 </span><span id="tsvdm-144"><a href="#tsvdm-144"><span class="linenos">144</span></a>
-</span><span id="tsvdm-145"><a href="#tsvdm-145"><span class="linenos">145</span></a><span class="sd">    V_tens : ndarray, shape: (p, p, t)</span>
+</span><span id="tsvdm-145"><a href="#tsvdm-145"><span class="linenos">145</span></a><span class="sd">    V_tens : ndarray of shape (p, p, t)</span>
 </span><span id="tsvdm-146"><a href="#tsvdm-146"><span class="linenos">146</span></a><span class="sd">        If `full_frontal_slices==False` shape is (p, k, t) instead</span>
 </span><span id="tsvdm-147"><a href="#tsvdm-147"><span class="linenos">147</span></a>
 </span><span id="tsvdm-148"><a href="#tsvdm-148"><span class="linenos">148</span></a><span class="sd">    References</span>
@@ -308,7 +308,7 @@ will return the tensor $V$ NOT $V^T$.</em></p>
 <h6 id="parameters">Parameters</h6>
 
 <ul>
-<li><strong>A : ndarray, shape</strong> ((n, p, t)):
+<li><strong>A</strong> (ndarray of shape (n, p, t)):
 Data tensor</li>
 <li><strong>M</strong> (Callable[[ndarray], ndarray] or None, default=None):
 A function which expects an order-3 tensor as input, and returns the
@@ -334,12 +334,12 @@ a matrix, with <code>t</code> columns total.</li>
 <h6 id="returns">Returns</h6>
 
 <ul>
-<li><strong>U_tens : ndarray, shape</strong> ((n, n, t)):
+<li><strong>U_tens</strong> (ndarray of shape (n, n, t)):
 If <code>full_frontal_slices==False</code> shape is (n, k, t) instead</li>
-<li><strong>S_tens : ndarray, shape</strong> ((n, p, t)):
+<li><strong>S_tens</strong> (ndarray of shape (n, p, t)):
 If <code>full_frontal_slices==False</code> shape is (k, k, t) instead
 If <code>svals_matrix_form==True</code>, <code>S_mat</code> of shape (k, t) returned instead</li>
-<li><strong>V_tens : ndarray, shape</strong> ((p, p, t)):
+<li><strong>V_tens</strong> (ndarray of shape (p, p, t)):
 If <code>full_frontal_slices==False</code> shape is (p, k, t) instead</li>
 </ul>
 
@@ -1652,7 +1652,7 @@ A function implementing the inverse transform of <code>M</code>.</li>
 </span><span id="facewise_product-32"><a href="#facewise_product-32"><span class="linenos">32</span></a>
 </span><span id="facewise_product-33"><a href="#facewise_product-33"><span class="linenos">33</span></a><span class="sd">    Returns</span>
 </span><span id="facewise_product-34"><a href="#facewise_product-34"><span class="linenos">34</span></a><span class="sd">    -------</span>
-</span><span id="facewise_product-35"><a href="#facewise_product-35"><span class="linenos">35</span></a><span class="sd">    C : ndarray, shape: (a, c, d)</span>
+</span><span id="facewise_product-35"><a href="#facewise_product-35"><span class="linenos">35</span></a><span class="sd">    C : ndarray of shape (a, c, d)</span>
 </span><span id="facewise_product-36"><a href="#facewise_product-36"><span class="linenos">36</span></a><span class="sd">        Facewise tensor product</span>
 </span><span id="facewise_product-37"><a href="#facewise_product-37"><span class="linenos">37</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="facewise_product-38"><a href="#facewise_product-38"><span class="linenos">38</span></a>    <span class="c1"># apply the lambda function cumulatively over the tensor inputs</span>
@@ -1678,7 +1678,7 @@ shape (a, b, d) and shape (b, c, d) respectively</li>
 <h6 id="returns">Returns</h6>
 
 <ul>
-<li><strong>C : ndarray, shape</strong> ((a, c, d)):
+<li><strong>C</strong> (ndarray of shape (a, c, d)):
 Facewise tensor product</li>
 </ul>
 </div>
@@ -1716,7 +1716,7 @@ Facewise tensor product</li>
 </span><span id="m_product-59"><a href="#m_product-59"><span class="linenos">59</span></a>
 </span><span id="m_product-60"><a href="#m_product-60"><span class="linenos">60</span></a><span class="sd">    Returns</span>
 </span><span id="m_product-61"><a href="#m_product-61"><span class="linenos">61</span></a><span class="sd">    -------</span>
-</span><span id="m_product-62"><a href="#m_product-62"><span class="linenos">62</span></a><span class="sd">    m_product : ndarray, shape: (a, c, d)</span>
+</span><span id="m_product-62"><a href="#m_product-62"><span class="linenos">62</span></a><span class="sd">    m_product : ndarray of shape (a, c, d)</span>
 </span><span id="m_product-63"><a href="#m_product-63"><span class="linenos">63</span></a><span class="sd">        Tensor-tensor m-product as found in Kilmer et al. (2021)</span>
 </span><span id="m_product-64"><a href="#m_product-64"><span class="linenos">64</span></a>
 </span><span id="m_product-65"><a href="#m_product-65"><span class="linenos">65</span></a><span class="sd">    References</span>
@@ -1765,7 +1765,7 @@ A function implementing the inverse tubal transformation of M</li>
 <h6 id="returns">Returns</h6>
 
 <ul>
-<li><strong>m_product : ndarray, shape</strong> ((a, c, d)):
+<li><strong>m_product</strong> (ndarray of shape (a, c, d)):
 Tensor-tensor m-product as found in Kilmer et al. (2021)</li>
 </ul>
 
