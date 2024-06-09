@@ -1104,7 +1104,7 @@ For these details see Mor et al. (2022).</p>
 </span><span id="display_tensor_facewise-40"><a href="#display_tensor_facewise-40"><span class="linenos">40</span></a><span class="sd">    Examples</span>
 </span><span id="display_tensor_facewise-41"><a href="#display_tensor_facewise-41"><span class="linenos">41</span></a><span class="sd">    --------</span>
 </span><span id="display_tensor_facewise-42"><a href="#display_tensor_facewise-42"><span class="linenos">42</span></a><span class="sd">    &gt;&gt;&gt; import numpy as np</span>
-</span><span id="display_tensor_facewise-43"><a href="#display_tensor_facewise-43"><span class="linenos">43</span></a><span class="sd">    &gt;&gt;&gt; from tdim import display_tensor_facewise as disp</span>
+</span><span id="display_tensor_facewise-43"><a href="#display_tensor_facewise-43"><span class="linenos">43</span></a><span class="sd">    &gt;&gt;&gt; from tred import display_tensor_facewise as disp</span>
 </span><span id="display_tensor_facewise-44"><a href="#display_tensor_facewise-44"><span class="linenos">44</span></a><span class="sd">    &gt;&gt;&gt; test = np.eye(3)[:, :, None] # a 3x3x1 tensor</span>
 </span><span id="display_tensor_facewise-45"><a href="#display_tensor_facewise-45"><span class="linenos">45</span></a><span class="sd">    &gt;&gt;&gt; print(test) # Numpy ndarrays default __str__ method is not intuitive</span>
 </span><span id="display_tensor_facewise-46"><a href="#display_tensor_facewise-46"><span class="linenos">46</span></a><span class="sd">    [[[1.]</span>
@@ -1162,7 +1162,7 @@ Order-3 tensor.</li>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tdim</span> <span class="kn">import</span> <span class="n">display_tensor_facewise</span> <span class="k">as</span> <span class="n">disp</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">tred</span> <span class="kn">import</span> <span class="n">display_tensor_facewise</span> <span class="k">as</span> <span class="n">disp</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">]</span> <span class="c1"># a 3x3x1 tensor</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">test</span><span class="p">)</span> <span class="c1"># Numpy ndarrays default __str__ method is not intuitive</span>
 <span class="go">[[[1.]</span>
