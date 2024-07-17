@@ -4,7 +4,7 @@ and tensor SVD. Most of the functionality in this module can be regarded as
 dimensionality reduction strategies for order-3 datasets of shape n, p, t, 
 where p >> n > t. 
 """
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 
 from ._m_transforms import (
